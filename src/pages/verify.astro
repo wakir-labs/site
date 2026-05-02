@@ -1,0 +1,154 @@
+---
+import Base from "../layouts/Base.astro";
+
+const title = "Verify a Wakir Labs commit";
+const description =
+  "How a third party verifies any commit in the Wakir Labs history with OpenTimestamps and Bitcoin.";
+---
+
+<Base title={title} description={description}>
+  <h1>Verify a Wakir Labs commit</h1>
+
+  <p>
+    Every commit in Wakir Labs repositories is timestamped against the
+    Bitcoin blockchain via <a href="https://opentimestamps.org">OpenTimestamps</a>.
+    The proof is a small <code>.ots</code> file checked in next to the
+    commit hash. With those two things — <em>any commit hash from our
+    history</em> and <em>the matching <code>.ots</code> file</em> — anyone
+    can verify, without trusting us, that the commit existed at or before
+    the timestamp baked into a specific Bitcoin block.
+  </p>
+
+  <p>
+    This is the public side of <em>Proof-of-History in practice</em>. It
+    is what we mean when we say the documentation is anchored.
+  </p>
+
+  <h2>Three steps</h2>
+
+  <h3>1. Install the OpenTimestamps client</h3>
+
+  <p>
+    The reference client is <code>ots</code>, distributed as a Python
+    package. On any platform with Python 3.8+:
+  </p>
+
+  <pre><code>pip install opentimestamps-client</code></pre>
+
+  <p>
+    Verify the install:
+  </p>
+
+  <pre><code>ots --version</code></pre>
+
+  <h3>2. Get the commit and its <code>.ots</code> proof</h3>
+
+  <p>
+    Clone the repository you want to verify. The proof files live under
+    <code>meta/timestamps/&lt;short-hash&gt;.ots</code>:
+  </p>
+
+  <pre><code>git clone https://github.com/wakir-labs/site.git
+cd site
+ls meta/timestamps/</code></pre>
+
+  <p>
+    Each file is the <code>.ots</code> attestation for one commit,
+    indexed by the commit's short hash.
+  </p>
+
+  <h3>3. Run <code>ots verify</code></h3>
+
+  <p>
+    For a worked example, take commit <code>82d40f7</code> from this
+    site's history (<em>"feat(about): add EN+DE about pages"</em>):
+  </p>
+
+  <pre><code># From inside the cloned repo:
+ots verify meta/timestamps/82d40f7.ots -d $(git rev-parse 82d40f7 | xxd -r -p | sha256sum | head -c 64)</code></pre>
+
+  <p>
+    The simpler form, when the proof was created against the raw commit
+    hash bytes used by our hook, is:
+  </p>
+
+  <pre><code>git rev-parse 82d40f7 | xxd -r -p &gt; /tmp/commit.bin
+ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
+
+  <p>
+    A successful verification prints something like:
+  </p>
+
+  <pre><code>Success! Bitcoin block N attests existence as of YYYY-MM-DD</code></pre>
+
+  <p>
+    That is the receipt. The commit existed at or before that Bitcoin
+    block. No trust in us required — only trust in Bitcoin and in the
+    OpenTimestamps calendar servers (which themselves only sign, they do
+    not back-date).
+  </p>
+
+  <h2>Where the source of truth lives</h2>
+
+  <p>
+    The full corporate repository — ADRs, activity log, governance — is
+    currently <strong>local to the supervisory board</strong>, not yet
+    public. Public verification today therefore covers the
+    <code>wakir-labs/*</code> repositories on GitHub
+    (<a href="https://github.com/wakir-labs">github.com/wakir-labs</a>).
+    When the corporate repository becomes public, the same recipe
+    applies: clone, point <code>ots verify</code> at the
+    <code>.ots</code> file and the commit hash, read the receipt.
+  </p>
+
+  <p>
+    Members of the supervisory board verify against their local clone of
+    the corporate repository the same way.
+  </p>
+
+  <h2>Advanced: verify against your own Bitcoin node</h2>
+
+  <p>
+    By default the OpenTimestamps client reaches out to public calendar
+    servers and, for the Bitcoin attestation, to a remote block explorer.
+    If you run your own Bitcoin node, you can verify the proof end-to-end
+    against your own copy of the chain:
+  </p>
+
+  <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
+
+  <p>
+    This removes the last residual trust assumption: you are now reading
+    the attestation directly from a chain you validate yourself.
+  </p>
+
+  <h2>If verification fails</h2>
+
+  <p>
+    Two normal reasons:
+  </p>
+
+  <ul>
+    <li>
+      <strong>The proof is "pending".</strong> Fresh commits live in the
+      calendar servers for a few hours before being aggregated into a
+      Bitcoin block. Run <code>ots upgrade meta/timestamps/&lt;hash&gt;.ots</code>
+      after a few hours, then re-verify.
+    </li>
+    <li>
+      <strong>You hashed the wrong thing.</strong> Our hook stamps the
+      raw 32-byte commit hash. Make sure you pass binary bytes
+      (<code>xxd -r -p</code>), not the ASCII hex.
+    </li>
+  </ul>
+
+  <p>
+    If neither applies, <a href="https://github.com/wakir-labs/site/issues">open an issue</a>.
+    A failed verification on a real commit is a finding we want to know
+    about.
+  </p>
+
+  <p>
+    <a href="/de/verify/">Auf Deutsch lesen</a>.
+  </p>
+</Base>

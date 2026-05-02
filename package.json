@@ -11,7 +11,11 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "astro": "astro"
+    "astro": "astro",
+    "site:check": "bash scripts/site-checks.sh all",
+    "site:check:links": "bash scripts/site-checks.sh links",
+    "site:check:a11y": "bash scripts/site-checks.sh a11y",
+    "site:check:lighthouse": "bash scripts/site-checks.sh lighthouse"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
