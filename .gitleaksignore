@@ -27,3 +27,6 @@ public/brand/fonts/README.md:hex-private-key-bare:64
 public/brand/fonts/README.md:hex-private-key-bare:65
 public/brand/fonts/README.md:hex-private-key-bare:86
 public/brand/fonts/LICENSE-SIL-OFL-1.1.txt:bip39-mnemonic-bare:22
+
+# 2026-05-04 — false positive: bip39-mnemonic-bare on prose body in verify.astro
+e6179284ba138534d200206df0e9cbfd13e41935:src/pages/verify.astro:bip39-mnemonic-bare:71
