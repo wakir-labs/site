@@ -1,10 +1,12 @@
 # Wakir Labs — Site
 
-Public website and Phase-1 publication channel for **Wakir Labs**.
+Source for [wakirlabs.com](https://wakirlabs.com), the public site
+and Phase-1 publication channel for **Wakir Labs**.
 
-- Stack: Astro 4.x + pnpm + Cloudflare Pages
-- Domain: https://wakirlabs.com
-- License: Apache 2.0
+- Stack: Astro 4.x, pnpm, Cloudflare Pages
+- License: Apache 2.0 (site code; prose remains copyright Wakir Labs
+  unless explicitly placed under a different license at the file
+  level)
 
 ## Local development
 
@@ -25,7 +27,7 @@ pnpm preview     # serve dist/ locally
 ## Deploy
 
 Cloudflare Pages is wired to this repo. Push to `main` triggers a
-production deploy. Every PR gets a preview URL.
+production deploy; every PR gets a preview URL.
 
 Build config (set in the Cloudflare Pages dashboard):
 
@@ -35,19 +37,20 @@ Build config (set in the Cloudflare Pages dashboard):
 
 ## Layout
 
-This repository follows the spec in
-`projects/comms/plattform-spec-fuer-tomas.md` (governance repo, internal).
 Phase-1 Astro scaffold is intentionally minimal:
 
-- `src/pages/index.astro` — landing page with brand wordmark + tagline.
+- `src/pages/index.astro` — landing page with brand wordmark and tagline.
 - `src/layouts/Base.astro` — shared shell.
 - `public/robots.txt` — crawl policy.
 - i18n: English default, German under `/de/...`.
 
-Content collections, RSS, Pagefind, and richer theming follow once the
-site is live.
+Content collections, RSS, Pagefind, and richer theming follow as the
+site fills up. Initial posts are migrated from the editorial drafts
+in the governance repo (`projects/comms/drafts/`) into
+`src/content/blog/en/<slug>.md` once each piece is approved for
+publication.
 
 ## License
 
-Apache 2.0. Site copy and prose remain copyright Wakir Labs unless
-explicitly placed under a different license at the file level.
+Apache 2.0 for the site code. The `LICENSE` file lands with the
+first repo sprint (Tomás).
