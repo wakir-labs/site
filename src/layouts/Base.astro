@@ -1,0 +1,35 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+}
+
+const {
+  title,
+  description = "Wakir Labs — humans as first-class roles in AI-agent systems.",
+  lang = "en",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <a href="/" aria-label="Wakir Labs home">Wakir Labs</a>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>&copy; {new Date().getFullYear()} Wakir Labs. Apache 2.0 where applicable.</p>
+    </footer>
+  </body>
+</html>
