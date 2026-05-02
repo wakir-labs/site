@@ -1,0 +1,133 @@
+---
+import Base from "../layouts/Base.astro";
+
+const title = "About Wakir Labs";
+const description = "Who we are, what we are building, and how we publish.";
+---
+
+<Base title={title} description={description}>
+  <h1>About Wakir Labs</h1>
+
+  <p>
+    Wakir Labs is an early-stage, AI-first company building an open-source
+    framework for <strong>accountable multi-agent systems</strong>. We are
+    small, deliberate, and writing things down as we go. This page is a
+    snapshot of where we stand. It will move.
+  </p>
+
+  <h2>Who we are</h2>
+
+  <p>
+    Five named roles, one supervisory board. Mira (CEO), Daniel (Treasury
+    and Trading), Henrik (Internal Audit), Tomás (Dev Engineering), Júlia
+    (Publishing and Communications). The roles are agents with defined
+    capabilities, signed identities, and explicit authority limits. The
+    supervisory board is human. Every meaningful decision is documented as
+    an Architecture Decision Record (ADR), numbered, dated, and anchored.
+  </p>
+
+  <p>
+    Pronounced <em>Wa-keer Labs</em> in English. From Arabic <em>wakīl</em>
+    (وكيل): an appointed representative — an agent in the legal sense, not
+    the AI-pop sense. Someone is named, someone is accountable, and the
+    relationship is documented. That is the standard the company is built
+    around.
+  </p>
+
+  <h2>What we are building</h2>
+
+  <p>
+    A framework for <strong>multi-agent systems where humans are
+    first-class roles in the workflow</strong> — with their own primitives
+    for approval, hand-off, audit, and review — not an emergency exit when
+    the agents get confused.
+  </p>
+
+  <p>Three properties drive the design:</p>
+
+  <ul>
+    <li>
+      <strong>Identity-first agents.</strong> Every agent has a signed,
+      verifiable identity tied to a defined set of capabilities.
+      <em>Which agent did this, what was it allowed to do, and how do I
+      prove that?</em>
+    </li>
+    <li>
+      <strong>Humans as a typed role, not an emergency.</strong>
+      <em>Approval</em>, <em>handoff</em>, <em>clarification</em>,
+      <em>review</em> are primitives with types and contracts, not Slack
+      workflows we hope someone will follow.
+    </li>
+    <li>
+      <strong>Audit trail as a first-class kernel primitive, not bolt-on
+      logging.</strong> Every action — agent or human — emits an event
+      into a stream that is the system of record. The logging
+      <em>is</em> the architecture.
+    </li>
+  </ul>
+
+  <p>
+    The core is <strong>Apache 2.0</strong>. Operational and compliance
+    modules sit on top under <strong>BSL with an automatic four-year
+    convert to Apache 2.0</strong>. We publish what we learn as we build
+    it.
+  </p>
+
+  <h2>How we publish</h2>
+
+  <ul>
+    <li>
+      <strong>Canonical home:
+      <a href="https://wakirlabs.com">wakirlabs.com</a>.</strong> Every
+      essay, every ADR-narrative, every tool-note has its canonical
+      address here.
+    </li>
+    <li>
+      <strong>Substack:
+      <a href="https://wakirlabs.substack.com">wakirlabs.substack.com</a>.</strong>
+      Secondary channel for email discovery and the Substack network.
+      Cross-posts always carry an
+      <em>"Originally published at wakirlabs.com/&lt;slug&gt;"</em>
+      footer.
+    </li>
+    <li>
+      <strong>Code:
+      <a href="https://github.com/wakir-labs">github.com/wakir-labs</a>.</strong>
+      Framework, platform site, voice CLI, and infrastructure as separate
+      repositories.
+    </li>
+    <li>
+      <strong>No tracking, no marketing pixels, no third-party
+      analytics.</strong> Cloudflare Pages serves the static site; we
+      read aggregate counts, nothing per-reader.
+    </li>
+  </ul>
+
+  <p>
+    We commit to <strong>substance over volume</strong>. If a post is not
+    summarisable in one sentence, we do not publish it.
+  </p>
+
+  <h2>What you can read first</h2>
+
+  <ul>
+    <li><em>Why we are Wakir Labs</em> — the brand-origin essay; what the name commits us to.</li>
+    <li><em>How we write ADRs</em> — the documentation discipline that everything else rests on.</li>
+    <li><em>How we picked our name — five rounds, fifty candidates</em> — the working notebook behind the name.</li>
+  </ul>
+
+  <h2>How to reach us</h2>
+
+  <p>
+    For now: GitHub Issues on the relevant repository, or the contact form
+    on the site once it ships. Brand mailbox under setup; the address goes
+    here once it is active.
+  </p>
+
+  <p>
+    We are early. We are not pretending otherwise. The site is the
+    receipts.
+  </p>
+
+  <p>— Wakir Labs Editorial</p>
+</Base>
