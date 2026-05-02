@@ -1,0 +1,152 @@
+# .gitleaks.toml — generated copy, DO NOT EDIT directly.
+#
+# Source of truth: AI-Corp scripts/git-hooks/templates/gitleaks.toml
+# Rendered at:    2026-05-02T17:14:58Z
+# Re-render with: bash scripts/setup-git-hooks.sh --refresh
+#                 (in the AI-Corp tree)
+#
+# Editing this file in the public repo is fine for one-off
+# experiments, but the next --refresh in AI-Corp will overwrite
+# it. Permanent changes belong in the central template above.
+#
+# Wakir Labs — gitleaks configuration.
+#
+# Ships in scripts/git-hooks/templates/. The setup script symlinks this
+# file into each target repo as <repo>/.gitleaks.toml. Edit here, not
+# in the symlinks — changes propagate to all repos automatically.
+#
+# Categories covered (per inbox 2026-05-03):
+#   - API tokens (Anthropic, OpenAI, ElevenLabs, GitHub, Cloudflare,
+#     ntfy bearer-style)
+#   - GPG / OpenSSH private-key headers
+#   - Wallet mnemonics (BIP39 sequence heuristic)
+#   - Hex private keys (0x-prefixed or bare 64-hex strings with
+#     entropy)
+#   - .env-style assignments leaked outside .env files
+#
+# Allowlist:
+#   - .env.example and docs/**/*.env.example are exempt.
+#   - Demo addresses with all-F/0/A/B/C/D/E hex (e.g. 0xDEADBEEF...,
+#     0x000...0001) are exempt.
+#   - Per-repo .gitleaksignore handles fingerprint-level exceptions
+#     (committed file).
+
+title = "wakir-labs default ruleset"
+
+[extend]
+# Inherit gitleaks' built-in rules (covers most provider tokens
+# we'd ever ship). We layer ours on top.
+useDefault = true
+
+# ---------------------------------------------------------------------------
+# Custom rules
+# ---------------------------------------------------------------------------
+
+[[rules]]
+id   = "anthropic-api-key"
+description = "Anthropic API key (sk-ant-…)"
+regex = '''sk-ant-[A-Za-z0-9_\-]{32,}'''
+tags  = ["key", "anthropic"]
+
+[[rules]]
+id   = "openai-api-key"
+description = "OpenAI API key (sk-…, project keys, sk-proj-…)"
+regex = '''sk-(?:proj-)?[A-Za-z0-9]{32,}'''
+tags  = ["key", "openai"]
+
+[[rules]]
+id   = "elevenlabs-api-key"
+description = "ElevenLabs API key"
+# ElevenLabs keys are typically 32-char hex. We require an explicit
+# variable-name anchor to avoid hitting commit hashes.
+regex = '''(?i)(elevenlabs|eleven)[ \t_\-]*(api[_\-]?key|token)\s*[:=]\s*['"]?[a-f0-9]{32,}['"]?'''
+tags  = ["key", "elevenlabs"]
+
+[[rules]]
+id   = "gpg-private-key-block"
+description = "PGP/GPG private key armor header"
+regex = '''-----BEGIN (PGP|RSA|DSA|EC|OPENSSH) PRIVATE KEY( BLOCK)?-----'''
+tags  = ["key", "gpg", "ssh"]
+
+[[rules]]
+id   = "hex-private-key-prefixed"
+description = "0x-prefixed 64-hex private key"
+regex = '''0x[a-fA-F0-9]{64}\b'''
+tags  = ["key", "wallet", "evm"]
+# Demo/dummy addresses are caught by the allowlist regex below.
+
+[[rules]]
+id   = "hex-private-key-bare"
+description = "Bare 64-hex string with entropy (likely private key)"
+regex = '''\b[a-fA-F0-9]{64}\b'''
+entropy = 3.5
+secretGroup = 0
+tags  = ["key", "wallet", "evm"]
+
+[[rules]]
+id   = "bip39-mnemonic"
+description = "BIP39 wallet mnemonic (12/15/18/21/24 lowercase words)"
+# Heuristic: 12+ space-separated lowercase words, each 3-8 chars.
+# False-positive prone on prose, so we additionally require an
+# explicit mnemonic-ish anchor in front. Anchored form catches the
+# common case ("MNEMONIC=...", "seed phrase: ..."). The unanchored
+# form below catches raw paste in fixtures via entropy.
+regex = '''(?i)(mnemonic|seed[_\- ]?phrase|recovery[_\- ]?phrase|wallet[_\- ]?seed)\s*[:=]\s*['"]?(?:[a-z]{3,8}\s+){11,23}[a-z]{3,8}['"]?'''
+tags  = ["wallet", "mnemonic"]
+
+[[rules]]
+id   = "bip39-mnemonic-bare"
+description = "Raw 12-word lowercase sequence (possible mnemonic)"
+regex = '''\b(?:[a-z]{3,8}\s+){11,23}[a-z]{3,8}\b'''
+entropy = 3.0
+tags  = ["wallet", "mnemonic"]
+
+[[rules]]
+id   = "env-style-token-leak"
+description = "*_TOKEN= / *_KEY= / *_SECRET= / NTFY_TOPIC= outside .env"
+# Variable name on the left, non-empty value on the right. We allow
+# empty values (placeholder in .env.example) and the literal
+# "<...>" / "your-...-here" placeholder forms. The path-based
+# allowlist below exempts .env.example and docs.
+regex = '''(?m)^[A-Z][A-Z0-9_]*(_TOKEN|_KEY|_SECRET|_PASSWORD|_PASSPHRASE|NTFY_TOPIC)\s*=\s*[^\s<"'][^\s]{6,}'''
+tags  = ["env", "leak"]
+
+# ---------------------------------------------------------------------------
+# Global allowlist (path + content patterns)
+# ---------------------------------------------------------------------------
+
+[allowlist]
+description = "wakir-labs allowlist for demo/example values"
+
+paths = [
+    '''(^|/)\.env\.example$''',
+    '''(^|/)\.env\.template$''',
+    '''(^|/)\.env\.sample$''',
+    '''(^|/)docs/.*\.env\.example$''',
+    # Test fixtures are commonly noisy — keep them tight: only the
+    # explicit fixtures dir, not anything *test*.
+    '''(^|/)tests/fixtures/''',
+    # gitleaks own config is allowed to contain example regex bodies.
+    '''(^|/)\.gitleaks\.toml$''',
+    '''(^|/)\.gitleaksignore$''',
+    '''(^|/)scripts/git-hooks/templates/gitleaks\.toml$''',
+    # Documentation about this hook will quote demo strings.
+    '''(^|/)scripts/git-hooks/README\.md$''',
+    '''(^|/)docs/security/.*\.md$''',
+]
+
+regexes = [
+    # Demo / dummy addresses: 0xDEADBEEF... (any case), 0x0...0,
+    # 0x1...1, classic null/burn addresses.
+    '''0x[dD][eE][aA][dD][bB][eE][eE][fF][a-fA-F0-9]*''',
+    '''0x0{40}''',
+    '''0x[fF]{40}''',
+    '''0x[0-9a-fA-F]*[dD][eE][aA][dD]''',
+    # Vitalik's well-known test address occasionally shows up in docs.
+    '''0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045''',
+    # ntfy topic *placeholders* documented in this repo.
+    '''NTFY_TOPIC=$''',
+    '''NTFY_TOPIC=aicorp-audit-7f3k9q2''',
+    # Common placeholder strings.
+    '''(?i)(your|example|placeholder|change[-_ ]?me|fake|dummy|demo|sk-xxx)''',
+]

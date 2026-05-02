@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Wakir Labs — Cover (Phase 1, typografisch, Tufte-Stil)
+  Spezifikation: substack-setup.md §4
+  - 1500 x 500, Off-White Hintergrund (#FAF7F0), schwarz (#1A1B1F)
+  - Wortmark zentriert + Tagline klein darunter
+  - Keine Stock-Fotos, keine Verläufe, keine Marketing-Effekte
+  Hinweis zu Schriften wie bei Avatar (siehe README).
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1500 500" width="1500" height="500"
+     role="img"
+     aria-label="Wakir Labs — Accountable multi-agent systems, a framework for AI-first organizations.">
+  <rect width="1500" height="500" fill="#FAF7F0"/>
+  <g font-family="'Source Serif 4', 'Source Serif Pro', 'Georgia', serif"
+     fill="#1A1B1F" text-anchor="middle">
+    <!-- Wortmark: Wakir Labs -->
+    <text x="750" y="245" font-size="120" font-weight="700"
+          letter-spacing="0">Wakir Labs</text>
+    <!-- Dezenter Trennstrich (Tufte-Anlehnung) -->
+    <line x1="650" y1="290" x2="850" y2="290"
+          stroke="#1A1B1F" stroke-width="1"/>
+    <!-- Tagline -->
+    <text x="750" y="345" font-size="28" font-weight="400"
+          font-style="italic" letter-spacing="0.5">
+      Accountable multi-agent systems,
+    </text>
+    <text x="750" y="385" font-size="28" font-weight="400"
+          font-style="italic" letter-spacing="0.5">
+      a framework for AI-first organizations.
+    </text>
+  </g>
+</svg>

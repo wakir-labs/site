@@ -1,0 +1,29 @@
+# Per-repo gitleaks fingerprint allowlist.
+#
+# Each line is a "fingerprint" (path:rule-id:secret-line-hash) that
+# gitleaks prints when it reports a finding. Add a fingerprint here
+# only if you've manually verified that the hit is a false positive
+# (e.g. a documented demo value that the path/regex allowlist in
+# .gitleaks.toml didn't catch).
+#
+# Format:
+#   <fingerprint>           # one per line, comments with # OK
+#
+# Example:
+#   docs/example.md:hex-private-key-bare:abcd1234
+#
+# Maintained by: whoever pushed the repo. Review by: Henrik (audit).
+
+# 2026-05-03 — Tomás (Dev-Engineering):
+# OFL 1.1 license body and the supply-chain SHA-256 pin block in the
+# vendored-fonts README contain 64-hex strings that look like EVM
+# private keys to the heuristic, plus the OFL preamble has 12+ word
+# lowercase prose runs that hit bip39-mnemonic-bare. These are
+# verified false positives — the strings are SHA-256 digests of
+# upstream Adobe fonts and the verbatim SIL OFL 1.1 license text.
+public/brand/fonts/README.md:hex-private-key-bare:62
+public/brand/fonts/README.md:hex-private-key-bare:63
+public/brand/fonts/README.md:hex-private-key-bare:64
+public/brand/fonts/README.md:hex-private-key-bare:65
+public/brand/fonts/README.md:hex-private-key-bare:86
+public/brand/fonts/LICENSE-SIL-OFL-1.1.txt:bip39-mnemonic-bare:22
