@@ -5,13 +5,14 @@
  * Editorial decisions 2026-05-04: accent A (sand-gold), dark-default,
  * reading-width 680px, featured post on index, OG-images Phase 2 (deferred).
  *
- * Theme model (2026-05-04): hybrid. Default is dark. The session-scoped
- * ThemeToggle (components/ThemeToggle.astro) writes
- * `data-theme="light"|"dark"` on <html> when the user clicks; that wins.
- * If `data-theme` is unset (fresh tab, no toggle), the
- * `@media (prefers-color-scheme: light)` block at the bottom honours the
- * OS preference. The toggle persists only in sessionStorage and is wiped
- * on tab close. The cookie-banner / consent decision for any longer-lived
+ * Theme model (2026-05-04, board directive 22:10 CEST): dark-first,
+ * deterministic. Default is dark for every fresh tab regardless of OS
+ * setting. The session-scoped ThemeToggle (components/ThemeToggle.astro)
+ * writes `data-theme="light"|"dark"` on <html> when the user clicks; that
+ * wins for the current tab. The previous `prefers-color-scheme` fallback
+ * was removed — we no longer adopt the OS preference automatically.
+ * sessionStorage is wiped on tab close, so the next fresh tab is dark
+ * again. The cookie-banner / consent decision for any longer-lived
  * persistence stays with ADR-0030.
  */
 
@@ -90,17 +91,6 @@
   --color-code-fg: #1A1B1F;
 }
 
-/* Honor system preference when no explicit choice stored */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    --color-bg: #FAF7F0;
-    --color-bg-elevated: #F2EEE3;
-    --color-body: #1A1B1F;
-    --color-muted: #5A5B60;
-    --color-border: #D8D2C2;
-    --color-accent: #7D6020;
-    --color-accent-hover: #6A511B;
-    --color-code-bg: #F2EEE3;
-    --color-code-fg: #1A1B1F;
-  }
-}
+/* No `prefers-color-scheme` fallback: per board directive 2026-05-04, the
+ * site opens in dark for every fresh tab. The user's click on the toggle
+ * (sessionStorage) is the only signal that flips it to light. */

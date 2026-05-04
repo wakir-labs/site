@@ -153,12 +153,26 @@ const articleJsonLd = ogType === "article"
 
     <title>{title}</title>
 
-    {/* Theme: OS preference via `prefers-color-scheme` (see styles/tokens.css)
-        plus a session-scoped toggle (see components/ThemeToggle.astro). The
-        toggle writes to sessionStorage only, which is wiped on tab close —
-        transient persistence, no cookie, no localStorage. Pre-paint FOUC
-        bootstrap deliberately omitted; see ThemeToggle.astro for rationale.
-        ADR-0030 follow-up still owns the cookie-banner decision. */}
+    {/* Theme bootstrap (2026-05-04, board directive 22:10 CEST). Dark is the
+        deterministic default for every fresh tab; the OS `prefers-color-scheme`
+        is no longer consulted. This inline script runs before body render so
+        that `data-theme` is present on <html> at first paint, preventing the
+        FOUC that the dark-default would otherwise produce on a tab whose
+        previous session was light (or any UA that defaults its initial paint
+        to light from the `<meta color-scheme>` hint). The toggle component
+        owns the click handler and only writes sessionStorage. ADR-0030
+        follow-up still owns the cookie-banner decision. */}
+    <script is:inline>
+      (function () {
+        try {
+          var v = sessionStorage.getItem("theme");
+          var theme = (v === "light" || v === "dark") ? v : "dark";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
