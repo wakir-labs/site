@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+
+const title = "Page not found — Wakir Labs";
+const description = "The page you tried to reach does not exist.";
+---
+
+<Base title={title} description={description}>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Page not found</h1>
+      <p class="essay__lead">
+        The page you tried to reach does not exist (yet). The Wakir Labs site
+        is early &mdash; we publish slowly and on purpose.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <p>Try one of these instead:</p>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about/">About Wakir Labs</a></li>
+        <li><a href="/rss.xml">RSS feed</a></li>
+      </ul>
+
+      <p>
+        If you followed a link from elsewhere on this site, that is a bug.
+        <a href="https://github.com/wakir-labs/site/issues">Open an issue</a>
+        and tell us where the dead link came from.
+      </p>
+    </div>
+  </article>
+</Base>
