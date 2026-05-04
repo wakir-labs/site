@@ -1,0 +1,60 @@
+---
+/**
+ * Hero — index page only
+ *
+ * Marketing-surface extended per editorial decision 2026-05-04.
+ * Tone: Stripe-Press, not Vercel-marketing-hype (brand-guide §4 forbidden).
+ *
+ * Visual added 2026-05-04: a single typographic wordmark-lockup with
+ * a sand-gold accent rule, rendered via the Wordmark component.
+ * Brand-Guide §10 compliant — typographic only, no 3D, no stock,
+ * no animation.
+ */
+import Wordmark from "./Wordmark.astro";
+
+interface Props {
+  eyebrow?: string;
+  headline: string;
+  subhead?: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  /** Show the typographic wordmark above the eyebrow. Default true. */
+  showWordmark?: boolean;
+}
+
+const {
+  eyebrow,
+  headline,
+  subhead,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  showWordmark = true,
+} = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-headline">
+  <div class="hero__inner">
+    {showWordmark && (
+      <div class="hero__wordmark" aria-hidden="true">
+        <Wordmark size="1.75rem" />
+      </div>
+    )}
+    {eyebrow && <p class="hero__eyebrow">{eyebrow}</p>}
+    <h1 id="hero-headline" class="hero__headline">{headline}</h1>
+    {subhead && <p class="hero__subhead">{subhead}</p>}
+    <div class="hero__ctas">
+      <a class="btn btn--primary" href={primaryHref}>{primaryLabel}</a>
+      {
+        secondaryHref && secondaryLabel && (
+          <a class="btn btn--secondary" href={secondaryHref}>
+            {secondaryLabel}
+          </a>
+        )
+      }
+    </div>
+  </div>
+</section>

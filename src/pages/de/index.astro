@@ -1,13 +1,56 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Hero from "../../components/Hero.astro";
+import FeatureSection from "../../components/FeatureSection.astro";
+import NewsletterCTA from "../../components/NewsletterCTA.astro";
 ---
 
-<Base title="Wakir Labs" lang="de" description="Wakir Labs — Accountable multi-agent systems, a framework for AI-first organizations.">
-  <h1>Wakir Labs</h1>
-  <h2>Accountable multi-agent systems — a framework for AI-first organizations.</h2>
-  <p>
-    Vor dem Start. Framework, Texte und Open-Source-Tools erscheinen hier.
-    Newsletter unter <a href="https://wakirlabs.substack.com">wakirlabs.substack.com</a>,
-    Hintergrund auf der <a href="/de/about/">Über-Seite</a>.
-  </p>
+<Base
+  title="Wakir Labs"
+  lang="de"
+  description="Wakir Labs — accountable multi-agent systems, ein Framework für AI-first-Organisationen."
+>
+  <Hero
+    eyebrow="Pre-Launch"
+    headline="Verantwortliche Multi-Agent-Systeme."
+    subhead="Ein Framework für AI-first-Organisationen. Open Source. Audit-verankert in Bitcoin. Öffentlich betrieben."
+    primaryHref="/de/about/"
+    primaryLabel="Framework-Einstieg lesen"
+    secondaryHref="https://wakirlabs.beehiiv.com/subscribe"
+    secondaryLabel="Field Notes abonnieren"
+  />
+
+  <section class="features" aria-label="Was Wakir Labs ist">
+    <FeatureSection
+      title="Was wir bauen"
+      href="/de/about/"
+      linkLabel="Mehr lesen"
+    >
+      Open-Source-Framework für Multi-Agent-Systeme, in denen Menschen
+      first-class Rollen sind &mdash; nicht der Notausgang, wenn die Agenten
+      verwirrt sind.
+    </FeatureSection>
+
+    <FeatureSection
+      title="Wie wir arbeiten"
+      href="/de/verify/"
+      linkLabel="Verifikation in der Praxis"
+    >
+      Jede Entscheidung ist ein ADR, in Bitcoin verankert via
+      OpenTimestamps. Der Audit-Trail ist die Architektur, kein nachträgliches Logging.
+    </FeatureSection>
+
+    <FeatureSection
+      title="Was wir veröffentlichen"
+      href="/de/about/"
+      linkLabel="Über Wakir Labs"
+    >
+      Long-Form-Essays, ADR-Erzählungen, Tool-Notes. Wöchentliche Field
+      Notes auf Beehiiv. Code auf GitHub. Kein Tracking, keine Marketing-Pixel.
+    </FeatureSection>
+  </section>
+
+  <section class="container container--wide">
+    <NewsletterCTA variant="footer" />
+  </section>
 </Base>

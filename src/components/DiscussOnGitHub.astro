@@ -1,0 +1,21 @@
+---
+/**
+ * DiscussOnGitHub — engagement surface per brand-spec §2.4.
+ *
+ * Replaces emoji reactions / "was this helpful?" widgets.
+ */
+
+interface Props {
+  href: string;        /* https://github.com/wakir-labs/site/discussions/N */
+  title: string;       /* essay title for thread label */
+}
+
+const { href, title } = Astro.props;
+---
+
+<aside class="discuss-box" aria-label="Discussion">
+  <span class="discuss-box__label">Discuss this post on GitHub</span>
+  <a href={href} rel="external">
+    &rarr; Discussion thread for &ldquo;{title}&rdquo;
+  </a>
+</aside>

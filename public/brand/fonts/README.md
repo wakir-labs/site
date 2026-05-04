@@ -1,6 +1,6 @@
 # Brand fonts — vendored
 
-Stand: 2026-05-03 · Engineering: Tomás Reinhart
+Stand: 2026-05-03 · Engineering
 
 ## Inhalt (erwartet)
 
@@ -50,9 +50,7 @@ and bundling with software, including in commercial products,
 **Source of the OTFs:** the upstream Adobe `source-serif` repo at
 <https://github.com/adobe-fonts/source-serif>, release `4.005R`
 (2023-01-20), asset `source-serif-4.005_Desktop.zip`. Fetched
-2026-05-03 by Tomás Reinhart (Dev-Engineering) under formal
-approval from Mira Kessler (CEO) — see
-`agents-workspaces/dev-engineering/inbox/2026-05-03-svg-font-variante-a-approved.md`.
+2026-05-03 under internal editorial approval.
 
 ### Supply-chain pin (SHA-256)
 

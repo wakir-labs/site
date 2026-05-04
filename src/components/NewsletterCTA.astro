@@ -1,0 +1,47 @@
+---
+/**
+ * NewsletterCTA — Beehiiv-external link block.
+ *
+ * Per ADR-0024 + editorial decision 2026-05-04:
+ *   - No own capture, no email input, no tracking pixel.
+ *   - External link only to Beehiiv subscribe page.
+ *   - Two placements:
+ *       variant="inline"  — at end of long-form essay (compact one-liner).
+ *       variant="footer"  — site-footer area subscribe block.
+ */
+
+interface Props {
+  variant?: "inline" | "footer";
+  beehiivUrl?: string;
+}
+
+const {
+  variant = "inline",
+  beehiivUrl = "https://wakirlabs.beehiiv.com/subscribe",
+} = Astro.props;
+---
+
+{
+  variant === "inline" ? (
+    <aside class="newsletter newsletter--compact" aria-label="Newsletter">
+      <p class="newsletter__desc">
+        This was a long essay. The weekly Field Notes is shorter — about 600
+        words, every Thursday.
+      </p>
+      <a class="newsletter__cta" href={beehiivUrl} rel="external">
+        Subscribe to Field Notes &rarr;
+      </a>
+    </aside>
+  ) : (
+    <aside class="newsletter" aria-label="Newsletter">
+      <div class="newsletter__label">Field Notes &mdash; the weekly newsletter</div>
+      <p class="newsletter__desc">
+        Roughly 600 words, every Thursday. The writing in context: what we
+        shipped, what we decided, what we learned.
+      </p>
+      <a class="newsletter__cta" href={beehiivUrl} rel="external">
+        Subscribe on Beehiiv &rarr;
+      </a>
+    </aside>
+  )
+}

@@ -1,0 +1,110 @@
+---
+import Base from "../layouts/Base.astro";
+import ADRBox from "../components/ADRBox.astro";
+import DiscussOnGitHub from "../components/DiscussOnGitHub.astro";
+import NewsletterCTA from "../components/NewsletterCTA.astro";
+
+/* Long-form essay stub — placeholder body until the W1 draft lands.
+ * The point of this page in this sprint is the *template*: post header,
+ * lead paragraph, body with H2/H3, ADR Box, code block, end-of-post stack
+ * (Discuss, Newsletter), prev/next navigation. Replace body when the real
+ * essay is wired through MDX or a content collection. */
+
+const title = "Why we are Wakir Labs";
+const description =
+  "Naming-as-methodology — five rounds, fifty candidates, one verifiable trail.";
+---
+
+<Base
+  title={title}
+  description={description}
+  ogType="article"
+  publishedTime="2026-05-03"
+>
+  <article class="essay">
+    <header class="essay__header">
+      <p class="essay__meta">
+        <span>2026-05-XX</span>
+        <span>8 min read</span>
+        <span>brand &middot; methodology</span>
+      </p>
+      <h1 class="essay__title">{title}</h1>
+      <p class="essay__lead">
+        We picked a name the way we will pick everything else: by writing the
+        decision down, signing it with a key, and stamping the signature into
+        Bitcoin. The name is the first artifact of the methodology.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>The question</h2>
+      <p>
+        Most company names are picked in a brainstorm and approved by a
+        founder over coffee. That works fine right up until someone asks
+        <em>why</em>. We wanted a record of the why &mdash; not because we
+        expect challenge, but because the discipline of recording the why is
+        the point of the company.
+      </p>
+
+      <p>
+        The brief was simple: a name that means something in the language of
+        the thing we build, that survives a trademark search, that sounds
+        like an archive instead of a launch. Five rounds and fifty
+        candidates later, the answer was a word from Arabic legal usage.
+      </p>
+
+      <ADRBox
+        id="0018"
+        title="Brand name"
+        status="Accepted"
+        decided="2026-05-02"
+        summary="Wakir Labs &mdash; from Arabic wakīl, an appointed representative. Rejects pop-AI agent semantics in favor of legal-agent semantics."
+        verifyUrl="https://opentimestamps.org/info?digest=…"
+        verifyBlock="898241"
+        verifyDate="2026-05-03"
+        href="/decisions/0018-brand-name/"
+      />
+
+      <h2>How the trail works</h2>
+      <p>
+        Every decision lands as an ADR. Every commit on the repository
+        carries a timestamp anchored in a Bitcoin block. The verification is
+        public:
+      </p>
+
+      <pre><code class="language-bash">{`# In a clone of the repo:
+ots verify -f <(git rev-parse 8aa88b9 | xxd -r -p) \\
+  meta/timestamps/8aa88b9.ots`}</code></pre>
+
+      <p>
+        The output names the Bitcoin block that attests the commit existed
+        at or before its mining time. No trust in us required &mdash; only
+        in Bitcoin and the OpenTimestamps calendar servers, which only sign,
+        never back-date.
+      </p>
+
+      <h2>What the name commits us to</h2>
+      <p>
+        <em>Wakil</em> in Arabic legal use means an appointed representative
+        with bounded authority. That is the ontology of our framework: every
+        agent is appointed, every agent has a defined scope, and the
+        relationship is documented. The name is the mission statement
+        compressed to two syllables.
+      </p>
+
+      <hr />
+    </div>
+
+    <DiscussOnGitHub
+      href="https://github.com/wakir-labs/site/discussions"
+      title={title}
+    />
+
+    <NewsletterCTA variant="inline" />
+
+    <nav class="essay__nav" aria-label="Post navigation">
+      <span>&larr; previous post</span>
+      <span>next post &rarr;</span>
+    </nav>
+  </article>
+</Base>

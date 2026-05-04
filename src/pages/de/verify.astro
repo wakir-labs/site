@@ -7,9 +7,10 @@ const description =
 ---
 
 <Base title={title} description={description} lang="de">
-  <h1>Einen Wakir-Labs-Commit verifizieren</h1>
-
-  <p>
+  <article class="essay">
+  <header class="essay__header">
+    <h1 class="essay__title">Einen Wakir-Labs-Commit verifizieren</h1>
+    <p class="essay__lead">
     Jeder Commit in den Wakir-Labs-Repositories wird per
     <a href="https://opentimestamps.org">OpenTimestamps</a> gegen die
     Bitcoin-Blockchain zeitgestempelt. Der Beweis ist eine kleine
@@ -18,7 +19,10 @@ const description =
     unserer Historie</em> und <em>der zugehörigen <code>.ots</code>-Datei</em>
     — kann jede:r ohne Vertrauen in uns nachweisen, dass der Commit zum
     Zeitpunkt eines bestimmten Bitcoin-Blocks bereits existierte.
-  </p>
+    </p>
+  </header>
+
+  <div class="essay__body">
 
   <p>
     Das ist die öffentliche Seite von <em>Proof-of-History in der
@@ -148,4 +152,6 @@ ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
   <p>
     <a href="/verify/">Read in English</a>.
   </p>
+  </div>
+  </article>
 </Base>

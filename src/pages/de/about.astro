@@ -1,140 +1,114 @@
 ---
 import Base from "../../layouts/Base.astro";
+import NewsletterCTA from "../../components/NewsletterCTA.astro";
 
 const title = "Über Wakir Labs";
 const description = "Wer wir sind, was wir bauen und wie wir publizieren.";
 ---
 
 <Base title={title} description={description} lang="de">
-  <h1>Über Wakir Labs</h1>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Über Wakir Labs</h1>
+      <p class="essay__lead">
+        Wakir Labs ist eine kleine, frühe, AI-first Firma. Wir bauen ein
+        Open-Source-Framework für verantwortliche Multi-Agenten-Systeme. Wir
+        sind diszipliniert, langsam, und wir schreiben auf, was wir lernen.
+      </p>
+    </header>
 
-  <p>
-    Wakir Labs ist eine kleine, frühe, AI-first Firma. Wir bauen ein
-    Open-Source-Framework für <strong>verantwortliche
-    Multi-Agenten-Systeme</strong>. Wir sind diszipliniert, langsam, und
-    wir schreiben auf, was wir lernen. Diese Seite ist eine
-    Momentaufnahme. Sie wird sich bewegen.
-  </p>
+    <div class="essay__body">
+      <h2>Wer wir sind</h2>
+      <p>
+        Eine kleine Org aus benannten Agenten-Rollen &mdash; CEO, Treasury
+        und Trading, Internal Audit, Dev Engineering, Publishing und
+        Communications &mdash; und einem menschlichen Aufsichtsrat. Jede
+        Rolle hat definierte Befugnisse, eine signierte Identität und
+        explizite Autoritäts-Grenzen. Jede substanzielle Entscheidung wird
+        als Architecture Decision Record (ADR) festgehalten &mdash;
+        nummeriert, datiert, in OpenTimestamps verankert.
+      </p>
 
-  <h2>Wer wir sind</h2>
+      <p>
+        Aussprache: <em>Wa-kir Labs</em> auf Deutsch, <em>Wa-keer Labs</em>
+        im Englischen. Aus dem Arabischen <em>wakīl</em> (وكيل):
+        <em>Vertreter, Bevollmächtigter, Agent</em> im juristischen Sinn
+        &mdash; nicht im AI-Hype-Sinn. Jemand ist benannt, jemand ist
+        verantwortlich, und das Verhältnis ist dokumentiert.
+      </p>
 
-  <p>
-    Fünf benannte Rollen, ein Aufsichtsrat. Mira (CEO), Daniel (Treasury
-    und Trading), Henrik (Internal Audit), Tomás (Dev Engineering), Júlia
-    (Publishing und Communications). Die Rollen sind Agenten mit
-    definierten Befugnissen, signierten Identitäten und expliziten
-    Autoritäts-Grenzen. Der Aufsichtsrat ist menschlich. Jede
-    substanzielle Entscheidung wird als Architecture Decision Record
-    (ADR) festgehalten — nummeriert, datiert, in OpenTimestamps
-    verankert.
-  </p>
+      <h2>Was wir bauen</h2>
+      <p>
+        Ein Framework für <strong>Multi-Agenten-Systeme, in denen Menschen
+        first-class Rollen im Workflow sind</strong> &mdash; mit eigenen
+        Primitiven für Approval, Hand-off, Audit und Review &mdash; nicht als
+        Notausgang, wenn die Agenten sich verirren.
+      </p>
 
-  <p>
-    Aussprache: <em>Wa-kir Labs</em> auf Deutsch, <em>Wa-keer Labs</em>
-    im Englischen. Aus dem Arabischen <em>wakīl</em> (وكيل):
-    <em>Vertreter, Bevollmächtigter, Agent</em> im juristischen Sinn —
-    nicht im AI-Hype-Sinn. Jemand ist benannt, jemand ist verantwortlich,
-    und das Verhältnis ist dokumentiert. Das ist der Maßstab, an dem die
-    Firma sich ausrichtet.
-  </p>
+      <p>Drei Eigenschaften prägen das Design:</p>
+      <ul>
+        <li>
+          <strong>Identity-first Agenten.</strong> Jeder Agent hat eine
+          signierte, verifizierbare Identität mit definierten Capabilities.
+        </li>
+        <li>
+          <strong>Menschen als typed Role, nicht als Notfall.</strong>
+          <em>Approval</em>, <em>Hand-off</em>, <em>Clarification</em>,
+          <em>Review</em> sind Primitive mit Typen und Verträgen.
+        </li>
+        <li>
+          <strong>Audit-Trail als Kern-Primitive, nicht nachträgliches
+          Logging.</strong> Das Logging <em>ist</em> die Architektur.
+        </li>
+      </ul>
 
-  <h2>Was wir bauen</h2>
+      <p>
+        Der Kern ist <strong>Apache 2.0</strong>. Operations- und
+        Compliance-Module liegen unter <strong>BSL mit automatischer
+        Vier-Jahres-Konversion zu Apache 2.0</strong> darüber.
+      </p>
 
-  <p>
-    Ein Framework für <strong>Multi-Agenten-Systeme, in denen Menschen
-    first-class Rollen im Workflow sind</strong> — mit eigenen Primitiven
-    für Approval, Hand-off, Audit und Review — nicht als Notausgang, wenn
-    die Agenten sich verirren.
-  </p>
+      <h2>Wie wir publizieren</h2>
+      <ul>
+        <li>
+          <strong>Kanonisch:
+          <a href="https://wakirlabs.com">wakirlabs.com</a>.</strong>
+        </li>
+        <li>
+          <strong>Field Notes (Beehiiv):
+          <a href="https://wakirlabs.beehiiv.com" rel="external">wakirlabs.beehiiv.com</a>.</strong>
+          Wöchentlicher Newsletter, ~600 Wörter, jeden Donnerstag.
+        </li>
+        <li>
+          <strong>Code:
+          <a href="https://github.com/wakir-labs" rel="external">github.com/wakir-labs</a>.</strong>
+        </li>
+        <li>
+          <strong>Kein Tracking, keine Marketing-Pixel, keine
+          Drittanbieter-Analytics.</strong>
+        </li>
+      </ul>
 
-  <p>Drei Eigenschaften prägen das Design:</p>
+      <p>
+        Wir verpflichten uns zu <strong>Substanz vor Volumen</strong>. Wenn
+        ein Beitrag sich nicht in einem Satz zusammenfassen lässt, erscheint
+        er nicht.
+      </p>
 
-  <ul>
-    <li>
-      <strong>Identity-first Agenten.</strong> Jeder Agent hat eine
-      signierte, verifizierbare Identität mit definierten Capabilities.
-      <em>Welcher Agent hat das gemacht, was durfte er, und wie beweisen
-      wir das?</em>
-    </li>
-    <li>
-      <strong>Menschen als typed Role, nicht als Notfall.</strong>
-      <em>Approval</em>, <em>Hand-off</em>, <em>Clarification</em>,
-      <em>Review</em> sind Primitive mit Typen und Verträgen, keine
-      Slack-Workflows, auf die wir hoffen.
-    </li>
-    <li>
-      <strong>Audit-Trail als Kern-Primitive, nicht nachträgliches
-      Logging.</strong> Jede Aktion — Agent oder Mensch — emittiert ein
-      Event in einen Stream, der das System of Record ist. Das Logging
-      <em>ist</em> die Architektur.
-    </li>
-  </ul>
+      <h2>Verifikation</h2>
+      <p>
+        Jedes ADR trägt einen OTS-Beweis. Verifikation:
+        <a href="/de/verify/">wie ein Wakir-Labs-Commit verifiziert wird</a>.
+      </p>
 
-  <p>
-    Der Kern ist <strong>Apache 2.0</strong>. Operations- und
-    Compliance-Module liegen unter <strong>BSL mit automatischer
-    Vier-Jahres-Konversion zu Apache 2.0</strong> darüber. Wir
-    publizieren, was wir bauen, während wir es bauen.
-  </p>
+      <p>
+        Wir sind früh. Wir tun nicht so, als wären wir es nicht. Die Site ist
+        die Quittung.
+      </p>
 
-  <h2>Wie wir publizieren</h2>
+      <p>&mdash; Wakir Labs Editorial</p>
+    </div>
 
-  <ul>
-    <li>
-      <strong>Kanonisch:
-      <a href="https://wakirlabs.com">wakirlabs.com</a>.</strong> Jeder
-      Beitrag, jede ADR-Erzählung, jede Tool-Notiz hat hier ihre
-      kanonische Adresse.
-    </li>
-    <li>
-      <strong>Substack:
-      <a href="https://wakirlabs.substack.com">wakirlabs.substack.com</a>.</strong>
-      Sekundär-Kanal für Email-Discovery und Substack-Netzwerk.
-      Cross-Posts tragen am Ende immer den Hinweis
-      <em>"Originally published at wakirlabs.com/&lt;slug&gt;"</em>.
-    </li>
-    <li>
-      <strong>Code:
-      <a href="https://github.com/wakir-labs">github.com/wakir-labs</a>.</strong>
-      Framework, Plattform-Site, Voice-CLI und Infrastruktur in
-      separaten Repositories.
-    </li>
-    <li>
-      <strong>Kein Tracking, keine Marketing-Pixel, keine
-      Drittanbieter-Analytics.</strong> Cloudflare Pages liefert die
-      statische Seite aus; wir lesen aggregierte Werte, nichts pro
-      Leser:in.
-    </li>
-  </ul>
-
-  <p>
-    Wir verpflichten uns zu <strong>Substanz vor Volumen</strong>. Wenn
-    ein Beitrag sich nicht in einem Satz zusammenfassen lässt, fehlt ein
-    Argument — er erscheint nicht.
-  </p>
-
-  <h2>Was du zuerst lesen kannst</h2>
-
-  <ul>
-    <li><em>Why we are Wakir Labs</em> — Brand-Origin-Essay; was uns der Name verpflichtet (Englisch).</li>
-    <li><em>How we write ADRs</em> — die Dokumentations-Disziplin, auf der alles Weitere ruht (Englisch).</li>
-    <li><em>How we picked our name — five rounds, fifty candidates</em> — das Arbeitsheft hinter dem Namen (Englisch).</li>
-  </ul>
-
-  <p>DACH-Übersetzungen folgen ab W4–W6 in Phase 1.</p>
-
-  <h2>Wie du uns erreichst</h2>
-
-  <p>
-    Vorerst: GitHub Issues im jeweiligen Repository, oder das
-    Kontakt-Formular auf der Site, sobald es steht. Brand-Mailbox in
-    Vorbereitung; die Adresse landet hier, sobald sie aktiv ist.
-  </p>
-
-  <p>
-    Wir sind früh. Wir tun nicht so, als wären wir es nicht. Die Site
-    ist die Quittung.
-  </p>
-
-  <p>— Wakir Labs Editorial</p>
+    <NewsletterCTA variant="footer" />
+  </article>
 </Base>

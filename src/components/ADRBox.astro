@@ -1,0 +1,60 @@
+---
+/**
+ * ADRBox — inline ADR reference with OTS verification.
+ *
+ * Per brand-spec §2.4.
+ */
+
+interface Props {
+  id: string;            /* "0011" */
+  title: string;         /* "Moat Strategie" */
+  status: string;        /* "Accepted" */
+  decided?: string;      /* ISO date "2026-04-19" */
+  summary: string;
+  verifyUrl?: string;    /* https://opentimestamps.org/info?... */
+  verifyBlock?: string;  /* "898241" */
+  verifyDate?: string;   /* "2026-04-22" */
+  href?: string;         /* canonical ADR URL */
+}
+
+const {
+  id,
+  title,
+  status,
+  decided,
+  summary,
+  verifyUrl,
+  verifyBlock,
+  verifyDate,
+  href,
+} = Astro.props;
+---
+
+<aside class="adr-box" aria-label={`ADR ${id} ${title}`}>
+  <div class="adr-box__title">
+    <span class="adr-box__id">ADR-{id}</span> &middot; {title}
+  </div>
+  <div class="adr-box__status">
+    Status: {status}
+    {decided && <> &middot; Decided {decided}</>}
+  </div>
+  <p class="adr-box__summary">{summary}</p>
+  {
+    verifyUrl && (
+      <div class="adr-box__verify">
+        <span>
+          <span class="adr-box__verify-mark">&check;</span> Verified on Bitcoin
+          {verifyBlock && <> (block #{verifyBlock}{verifyDate && <>, {verifyDate}</>})</>}
+        </span>
+        <a href={verifyUrl} rel="external">{verifyUrl}</a>
+      </div>
+    )
+  }
+  {
+    href && (
+      <a class="adr-box__cta" href={href}>
+        Read full ADR &rarr;
+      </a>
+    )
+  }
+</aside>

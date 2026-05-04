@@ -7,9 +7,10 @@ const description =
 ---
 
 <Base title={title} description={description}>
-  <h1>Verify a Wakir Labs commit</h1>
-
-  <p>
+  <article class="essay">
+  <header class="essay__header">
+    <h1 class="essay__title">Verify a Wakir Labs commit</h1>
+    <p class="essay__lead">
     Every commit in Wakir Labs repositories is timestamped against the
     Bitcoin blockchain via <a href="https://opentimestamps.org">OpenTimestamps</a>.
     The proof is a small <code>.ots</code> file checked in next to the
@@ -17,7 +18,10 @@ const description =
     history</em> and <em>the matching <code>.ots</code> file</em> — anyone
     can verify, without trusting us, that the commit existed at or before
     the timestamp baked into a specific Bitcoin block.
-  </p>
+    </p>
+  </header>
+
+  <div class="essay__body">
 
   <p>
     This is the public side of <em>Proof-of-History in practice</em>. It
@@ -151,4 +155,6 @@ ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
   <p>
     <a href="/de/verify/">Auf Deutsch lesen</a>.
   </p>
+  </div>
+  </article>
 </Base>

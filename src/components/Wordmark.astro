@@ -1,0 +1,63 @@
+---
+/**
+ * Wordmark — typographic brand mark for the index hero.
+ *
+ * Rationale (visual choice 2026-05-04, see outbox report):
+ *  - One typographic element only. No 3D, no animation, no stock imagery
+ *    (Brand-Guide §10). The accent rule is: "links and sidenote-marks"
+ *    (Brand-Guide §8 / tokens.css), and a wordmark-rule is a sidenote-
+ *    mark in spirit — a single horizontal stroke under the brand name
+ *    in #C8AA6A sand-gold matching the existing Tufte-style cover SVG.
+ *  - Pure inline SVG so it inherits theme color via `currentColor` for
+ *    the wordmark, and a fixed accent stop for the rule. No external
+ *    asset, no extra HTTP request, prints fine.
+ *  - Sized in em-units so it scales with the surrounding type stack;
+ *    the rule's width is hard-pinned in design space (the SVG viewBox)
+ *    so the proportion is preserved across font-size changes.
+ *
+ * Usage: place inside the hero, above the eyebrow line. One per page.
+ */
+
+interface Props {
+  /** Visual size in rem. Default 1.5rem matches the index hero rhythm. */
+  size?: string;
+  /** Accessible label override; default reads "Wakir Labs". */
+  label?: string;
+}
+
+const { size = "1.5rem", label = "Wakir Labs" } = Astro.props;
+---
+
+<svg
+  class="wordmark"
+  viewBox="0 0 220 36"
+  role="img"
+  aria-label={label}
+  style={`height: ${size}; width: auto;`}
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <text
+    x="0"
+    y="22"
+    font-family="'Source Serif 4', Georgia, 'Times New Roman', serif"
+    font-size="22"
+    font-weight="600"
+    letter-spacing="-0.4"
+    fill="currentColor"
+  >Wakir Labs</text>
+  <line
+    x1="0"
+    y1="32"
+    x2="220"
+    y2="32"
+    stroke="#C8AA6A"
+    stroke-width="1"
+  />
+</svg>
+
+<style>
+  .wordmark {
+    display: block;
+    color: var(--color-body);
+  }
+</style>

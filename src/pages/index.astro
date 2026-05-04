@@ -1,14 +1,93 @@
 ---
 import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import FeatureSection from "../components/FeatureSection.astro";
+import NewsletterCTA from "../components/NewsletterCTA.astro";
+
+/* Featured/pinned post — visually identical to others (Comms-§4 disputable,
+ * CEO-decision 2026-05-04: no FEATURED badge). First in chronological order
+ * for ~4–6 weeks, then rotates. */
+const posts = [
+  {
+    date: "2026-05-XX",
+    readMin: 8,
+    title: "Why we are Wakir Labs",
+    href: "/why-we-are-wakir-labs/",
+    desc:
+      "Naming-as-methodology — five rounds, fifty candidates, one verifiable trail.",
+    featured: true,
+  },
+  {
+    date: "2026-05-XX",
+    readMin: 6,
+    title: "How we write ADRs",
+    href: "/how-we-write-adrs/",
+    desc: "Architectural decisions as a content type.",
+  },
+];
 ---
 
 <Base title="Wakir Labs">
-  <h1>Wakir Labs</h1>
-  <h2>Accountable multi-agent systems — a framework for AI-first organizations.</h2>
-  <p>
-    Pre-launch. The framework, the writing, and the open-source tools land
-    here. Subscribe to the <a href="https://wakirlabs.substack.com">newsletter</a>
-    for updates, or read the <a href="/about/">about page</a> to see what
-    we are building.
-  </p>
+  <Hero
+    eyebrow="Pre-launch"
+    headline="Accountable multi-agent systems."
+    subhead="A framework for AI-first organizations. Open source. Audit-anchored to Bitcoin. Operated in public."
+    primaryHref="/why-we-are-wakir-labs/"
+    primaryLabel="Read the framework intro"
+    secondaryHref="https://wakirlabs.beehiiv.com/subscribe"
+    secondaryLabel="Subscribe to Field Notes"
+  />
+
+  <section class="features" aria-label="What Wakir Labs is">
+    <FeatureSection
+      title="What we built"
+      href="/why-we-are-wakir-labs/"
+      linkLabel="Read the framework intro"
+    >
+      An open-source framework for multi-agent systems with humans as
+      first-class roles &mdash; not an emergency exit when the agents get
+      confused.
+    </FeatureSection>
+
+    <FeatureSection
+      title="How we operate"
+      href="/proof-of-history-in-practice/"
+      linkLabel="Proof-of-history in practice"
+    >
+      Every decision is an ADR, anchored to Bitcoin via OpenTimestamps. The
+      audit trail is the architecture, not bolt-on logging.
+    </FeatureSection>
+
+    <FeatureSection
+      title="What we publish"
+      href="/about/"
+      linkLabel="About Wakir Labs"
+    >
+      Long-form essays, ADR-narratives, tool-notes. Weekly Field Notes on
+      Beehiiv. Source code on GitHub. No tracking, no marketing pixels.
+    </FeatureSection>
+  </section>
+
+  <section class="container container--wide" aria-labelledby="recent-writing">
+    <h2 id="recent-writing">Recent writing</h2>
+    <ul class="post-list">
+      {
+        posts.map((post) => (
+          <li class="post-list__item">
+            <p class="post-list__meta">
+              {post.date} &middot; {post.readMin} min read
+            </p>
+            <h3 class="post-list__title">
+              <a href={post.href}>{post.title}</a>
+            </h3>
+            <p class="post-list__desc">{post.desc}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="container container--wide">
+    <NewsletterCTA variant="footer" />
+  </section>
 </Base>

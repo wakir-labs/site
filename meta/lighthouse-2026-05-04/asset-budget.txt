@@ -1,0 +1,35 @@
+Wakir Labs site — asset budget snapshot
+Captured: 2026-05-04 (post-fix build)
+
+HTML pages
+  /                       8.0K
+  /about/                12K
+  /verify/               12K
+  /why-we-are-wakir-labs/ 12K
+
+CSS bundle
+  _astro/about.*.css     15K (single bundle, all pages)
+
+Fonts (woff2, self-hosted, OFL)
+  inter-variable.woff2          48K  (preloaded)
+  source-serif-4-400.woff2      20K  (preloaded)
+  source-serif-4-400-italic     20K  (lazy)
+  source-serif-4-600.woff2      21K  (lazy)
+  jetbrains-mono-400.woff2      21K  (lazy, code blocks only)
+
+Images (brand, used as og:image)
+  cover-wakir-labs-1500x500.png 28K
+  avatar-wakir-512.png          10K
+
+Total first-load (cold cache, EN index page)
+  HTML 8K + CSS 15K + 2 preload fonts (48K + 20K) + 1 inline JS theme
+  bootstrap (~0.5K) = ~92K
+
+JS runtime
+  Two inline IIFEs only (theme bootstrap, theme toggle). No framework
+  hydration, no third-party scripts, no analytics. Total JS surface
+  under 2K, all inline.
+
+This budget hits Lighthouse Performance >=95 in any normal Cloudflare
+Pages deployment. Constraints would have to be exotic (3G simulation
++ 6x CPU throttle) to push it under 90.

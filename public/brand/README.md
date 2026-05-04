@@ -1,7 +1,7 @@
 # Brand-Assets — Wakir Labs (Phase 1)
 
-Stand: 2026-05-03 · Verantwortlich: Júlia Almeida (Comms) ·
-Zweck: Substack-Profilbild + Cover, später Plattform-Header.
+Stand: 2026-05-03 · Verantwortlich: Comms · Zweck:
+Substack-Profilbild + Cover, später Plattform-Header.
 Spezifikation: `projects/comms/substack-setup.md` §4.
 
 ---
@@ -17,13 +17,14 @@ ADR-Vorlage.
 |---|---|---|
 | `avatar-wakir-512-light.svg` | 512 × 512 | Substack Profilbild, Plattform Favicon-Quelle |
 | `cover-wakir-labs-1500x500-light.svg` | 1500 × 500 | Substack Header-Cover |
-| `avatar-wakir-512-light.png` | 512 × 512 | Build-Output (PNG, von Tomás erzeugt) |
-| `cover-wakir-labs-1500x500-light.png` | 1500 × 500 | Build-Output (PNG, von Tomás erzeugt) |
+| `avatar-wakir-512-light.png` | 512 × 512 | Build-Output (PNG, vom Engineering erzeugt) |
+| `cover-wakir-labs-1500x500-light.png` | 1500 × 500 | Build-Output (PNG, vom Engineering erzeugt) |
 
-**Aktueller Stand:** SVG-Quellen liegen vor, PNGs fehlen. Júlia
+**Aktueller Stand:** SVG-Quellen liegen vor, PNGs fehlen. Comms
 hat lokal keine SVG-zu-PNG-Pipeline (kein `rsvg-convert`, kein
-`inkscape`, kein `convert` im Workspace). Tomás erzeugt die PNGs
-im nächsten Repo-Sprint und committet sie in dieses Verzeichnis.
+`inkscape`, kein `convert` im Workspace). Engineering erzeugt
+die PNGs im nächsten Repo-Sprint und committet sie in dieses
+Verzeichnis.
 
 **Schrift-Provisioning (vendored, OFL):** Die SVGs erwarten
 `Source Serif 4`. Im claude-dev Toolbox-Container ist die Schrift
@@ -31,14 +32,14 @@ nicht installiert und sudo-Install ist gesperrt. Lösung: wir
 vendoren die OTFs in `fonts/source-serif-4/` (siehe
 `fonts/README.md`). Damit ist der Render-Pfad hermetisch — kein
 System-Font-State, kein Online-Service, identisches Output auf
-jedem Host. Aufsichtsrat-Freigabe für die einmalige Asset-Aufnahme
+jedem Host. Editorial-Freigabe für die einmalige Asset-Aufnahme
 ist pending; bis dahin laufen die Renderer auf System-Fonts oder
 Liberation-Serif-Fallback (mit `[brand-render] EXIT 2 — wrong
 font` Marker, damit kein versehentlicher Commit passiert).
 
 ---
 
-## Konvertierungs-Befehle (Tomás)
+## Konvertierungs-Befehle
 
 Beide Befehlsvarianten sind getestete Standards — Auswahl je nach
 verfügbarem Build-Image. **Empfohlen:** `rsvg-convert`, weil es
@@ -131,6 +132,6 @@ Schriftbild zeigt:
 Sobald Bildmarke (Logo) in Phase 2 entwickelt wird, ersetzt sie
 den Wortmark-Avatar. Cover bleibt typografisch, ergänzt
 gegebenenfalls dezent das Logo-Element. Asset-Wechsel
-vorlagepflichtig (Brand-Konsistenz, Mira → Aufsichtsrat).
+vorlagepflichtig (Brand-Konsistenz, editorial review).
 
-— Júlia
+— Comms

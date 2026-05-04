@@ -53,4 +53,4 @@ publication.
 ## License
 
 Apache 2.0 for the site code. The `LICENSE` file lands with the
-first repo sprint (Tomás).
+first repo sprint.

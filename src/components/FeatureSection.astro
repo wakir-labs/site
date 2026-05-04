@@ -1,0 +1,22 @@
+---
+/**
+ * FeatureSection — three compact cards under hero on index page.
+ *
+ * Brand-spec: ADR-Box-style treatment, consistent with long-form pages.
+ * One feature per instance; render three side-by-side via parent grid.
+ */
+
+interface Props {
+  title: string;
+  href: string;
+  linkLabel: string;
+}
+
+const { title, href, linkLabel } = Astro.props;
+---
+
+<article class="feature">
+  <h2 class="feature__title">{title}</h2>
+  <p class="feature__body"><slot /></p>
+  <a class="feature__link" href={href}>{linkLabel} &rarr;</a>
+</article>

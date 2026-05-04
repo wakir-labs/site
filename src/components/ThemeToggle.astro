@@ -1,0 +1,45 @@
+---
+/**
+ * ThemeToggle — light/dark mode switch
+ *
+ * - Defaults to dark (brand-spec §2.2).
+ * - Honors prefers-color-scheme on first visit if user has not chosen.
+ * - Stores choice in localStorage as "theme" = "light" | "dark".
+ * - The inline <head> script in Base.astro sets the data-theme attribute
+ *   before paint to prevent FOUC.
+ */
+---
+
+<button
+  class="theme-toggle"
+  type="button"
+  aria-label="Toggle light or dark mode"
+  data-theme-toggle
+>
+  <span class="theme-toggle__icon" aria-hidden="true" data-theme-toggle-icon>
+    moon
+  </span>
+</button>
+
+<script is:inline>
+  (function () {
+    const btn = document.querySelector("[data-theme-toggle]");
+    if (!btn) return;
+    const icon = btn.querySelector("[data-theme-toggle-icon]");
+    const setIcon = (theme) => {
+      if (icon) icon.textContent = theme === "light" ? "sun" : "moon";
+    };
+    setIcon(document.documentElement.dataset.theme || "dark");
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.dataset.theme || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch (e) {
+        /* private mode — ignore */
+      }
+      setIcon(next);
+    });
+  })();
+</script>
