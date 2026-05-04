@@ -1,0 +1,201 @@
+# Wayback-on-push — submit the public site to the Internet Archive
+# after every successful Cloudflare Pages deploy.
+#
+# CONTEXT (ADR-0028).
+# The original ADR-0028 decision was a weekly cadence (`aicorp-wayback-
+# weekly.timer`). Aufsichtsrats-Direktive 2026-05-04 ~21:05 CEST upgrades
+# this to a per-deploy cadence so the Wayback record tracks the live
+# site closely, while the weekly timer remains as a safety net for the
+# case where this push-trigger is disabled, broken, or rate-limited.
+#
+# WHY GITHUB-ACTIONS, NOT A LOCAL POST-PUSH HOOK.
+# A local hook only fires on the laptop that pushed. Once contributors
+# (or Mira via PR-merge from a branch) push from elsewhere, hooks miss.
+# Server-side Actions are deterministic, leave a public audit trail,
+# and need zero per-machine setup.
+#
+# WHY A 60s WAIT BEFORE TRIGGER.
+# Cloudflare Pages builds and propagates a deploy in roughly 30s for
+# this Astro static site. 60s is the smallest round number that gives
+# us comfortable headroom. If a deploy is slow, the Wayback Save Page
+# Now endpoint will simply re-fetch on its own retry path — but we
+# prefer to give it a clean target the first time.
+#
+# RATE LIMITS / RESTRICTIONS.
+# Wayback's `/save/<url>` endpoint is unauthenticated for anonymous
+# usage. Documented soft limits are around 15 saves/min for anonymous
+# clients; we sleep ~6s between submissions to stay well under that.
+# If Wayback rate-limits us anyway (HTTP 429) or returns 5xx, we log
+# the failure and continue; the weekly timer (`aicorp-wayback-
+# weekly.timer`) remains the safety net.
+#
+# NO SECRETS.
+# This workflow does not touch tokens or `.env`. The Wayback save
+# endpoint is anonymous; the only outbound traffic is `curl` to
+# `web.archive.org`. Public site, public archive — no surface area
+# for credential leakage.
+#
+# AUDIT TRAIL.
+# - GitHub-Actions run logs (kept for the workflow's retention window).
+# - `wayback-on-push-<run_id>.json` uploaded as a workflow artifact
+#   with one record per submitted URL.
+
+name: Wayback snapshot on push
+
+on:
+  push:
+    branches:
+      - main
+  # Manual trigger so the Aufsichtsrat / Tomás can re-snapshot without
+  # an empty-commit. Useful for first-time activation and for the
+  # smoke-test described in the rollout report.
+  workflow_dispatch:
+
+# Only one run at a time. If two pushes arrive within 60s, the second
+# one cancels the first — we want the snapshot to reflect the latest
+# deploy, not an intermediate state.
+concurrency:
+  group: wayback-on-push
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    name: Submit URLs to Wayback Machine
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Wait for Cloudflare Pages deploy to settle
+        run: |
+          echo "Sleeping 60s to let the Cloudflare Pages deploy"
+          echo "for commit ${GITHUB_SHA} propagate before we ask"
+          echo "Wayback to fetch the new content."
+          sleep 60
+
+      - name: Submit URLs to Wayback Machine
+        id: submit
+        run: |
+          set -uo pipefail
+
+          # URL list. Kept inline rather than fetched from the private
+          # AI-Corp repo, to avoid coupling this public workflow to a
+          # private resource. Update this list when new top-level URLs
+          # ship. Source-of-truth mirror lives at
+          # `projects/comms/wayback-urls.txt` in the AI-Corp repo.
+          urls=(
+            "https://wakirlabs.com/"
+            "https://wakirlabs.com/de/"
+            "https://wakirlabs.com/about/"
+            "https://wakirlabs.com/de/about/"
+            "https://wakirlabs.com/why-we-are-wakir-labs/"
+            "https://wakirlabs.com/verify/"
+            "https://wakirlabs.com/de/verify/"
+            "https://wakirlabs.com/rss.xml"
+          )
+
+          mkdir -p artifacts
+          record="artifacts/wayback-on-push-${GITHUB_RUN_ID}.json"
+
+          ok=0
+          fail=0
+          {
+            echo "["
+            first=1
+            for u in "${urls[@]}"; do
+              now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              save_url="https://web.archive.org/save/${u}"
+              echo "==> ${u}" >&2
+
+              # -L follows the 302 to the snapshot URL. -w returns
+              # final HTTP status + final URL on stdout. We give
+              # Wayback up to 90s — its /save endpoint frequently
+              # blocks for 30-60s while it does the actual fetch.
+              resp="$(curl -sS -L \
+                --max-time 90 \
+                --connect-timeout 15 \
+                -A "wakir-labs-wayback-on-push/1.0 (+https://wakirlabs.com)" \
+                -o /dev/null \
+                -w '%{http_code} %{url_effective}' \
+                "${save_url}" 2>/dev/null || echo "0 curl-error")"
+
+              status="${resp%% *}"
+              final="${resp#* }"
+
+              # Treat 200 and 302 as success. Wayback often replies
+              # 200 with the snapshot URL in url_effective. 429 or
+              # 5xx -> log and move on; the weekly timer is the
+              # safety net.
+              if [[ "${status}" == "200" || "${status}" == "302" ]]; then
+                echo "    OK status=${status}" >&2
+                echo "    snapshot=${final}" >&2
+                ok=$((ok+1))
+                ok_marker=true
+              else
+                echo "    NON-OK status=${status} final=${final}" >&2
+                fail=$((fail+1))
+                ok_marker=false
+              fi
+
+              # JSON line. We don't have jq guaranteed; do it inline.
+              esc_url="${u//\"/\\\"}"
+              esc_final="${final//\"/\\\"}"
+              if (( first )); then
+                first=0
+              else
+                echo ","
+              fi
+              printf '  {"url": "%s", "status": %s, "ok": %s, "snapshot": "%s", "ts_utc": "%s"}' \
+                "${esc_url}" "${status:-0}" "${ok_marker}" "${esc_final}" "${now}"
+
+              # Be polite. ~10 URLs * 6s = 60s, comfortably under
+              # Wayback's documented ~15/min anonymous ceiling.
+              sleep 6
+            done
+            echo
+            echo "]"
+          } > "${record}"
+
+          echo "submitted=${#urls[@]} ok=${ok} fail=${fail}"
+          echo "ok=${ok}" >> "$GITHUB_OUTPUT"
+          echo "fail=${fail}" >> "$GITHUB_OUTPUT"
+          echo "submitted=${#urls[@]}" >> "$GITHUB_OUTPUT"
+          echo "record=${record}" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test — Availability API for root URL
+        # Best-effort: the Availability API caches aggressively, so a
+        # fresh save may not yet be reflected. Failure here does not
+        # fail the job; it just shows up in the run log.
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          echo "Asking Wayback Availability API for the most recent snapshot of wakirlabs.com..."
+          curl -sS --max-time 30 \
+            "https://archive.org/wayback/available?url=wakirlabs.com" \
+            | tee artifacts/availability-${GITHUB_RUN_ID}.json
+          echo
+
+      - name: Upload Wayback submission record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wayback-on-push-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 90
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Wayback snapshot on push"
+            echo
+            echo "- commit: \`${GITHUB_SHA}\`"
+            echo "- submitted: ${{ steps.submit.outputs.submitted }}"
+            echo "- ok: ${{ steps.submit.outputs.ok }}"
+            echo "- fail: ${{ steps.submit.outputs.fail }}"
+            echo "- record: \`${{ steps.submit.outputs.record }}\` (artifact)"
+            echo
+            echo "Weekly safety net: \`aicorp-wayback-weekly.timer\` on the Aufsichtsrats-Host."
+          } >> "$GITHUB_STEP_SUMMARY"
