@@ -5,8 +5,13 @@
  * Editorial decisions 2026-05-04: accent A (sand-gold), dark-default,
  * reading-width 680px, featured post on index, OG-images Phase 2 (deferred).
  *
- * All component CSS reads from these tokens. Light/dark mode via
- * [data-theme="light"] override on <html>.
+ * Theme model (2026-05-04): pure CSS via `prefers-color-scheme`. Default is
+ * dark; `@media (prefers-color-scheme: light)` flips to light when the OS
+ * advertises a light preference. The `[data-theme="light"]` /
+ * `[data-theme="dark"]` selectors below are kept intentionally — once a
+ * cookie-banner / consent flow lands (ADR-0030 follow-up), a JS toggle can
+ * set `data-theme` on <html> again and these blocks resume working without
+ * further CSS churn. Until then, no JS reads or writes them.
  */
 
 :root,

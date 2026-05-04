@@ -1,7 +1,6 @@
 ---
 import "../styles/global.css";
 import "../styles/components.css";
-import ThemeToggle from "../components/ThemeToggle.astro";
 
 interface Props {
   title: string;
@@ -153,21 +152,12 @@ const articleJsonLd = ogType === "article"
 
     <title>{title}</title>
 
-    <!-- Inline theme bootstrap to prevent FOUC (per brand-spec §2.2) -->
-    <script is:inline>
-      (function () {
-        try {
-          var stored = localStorage.getItem("theme");
-          if (stored === "light" || stored === "dark") {
-            document.documentElement.dataset.theme = stored;
-          } else {
-            document.documentElement.dataset.theme = "dark";
-          }
-        } catch (e) {
-          document.documentElement.dataset.theme = "dark";
-        }
-      })();
-    </script>
+    {/* Theme: pure CSS via `prefers-color-scheme` (see styles/tokens.css).
+        No JS, no localStorage — TDDDG §25 (Austria) treats persisted theme
+        choice as a non-essential storage operation requiring consent. Until
+        a cookie-banner decision lands (ADR-0030 follow-up), the toggle is
+        removed and theme follows OS preference only. Dark-default per
+        brand-spec §2.2 stays in tokens.css. */}
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
@@ -185,7 +175,6 @@ const articleJsonLd = ogType === "article"
             &middot;
             <a href="/de/" {...(!isEn ? { "aria-current": "page" } : {})}>de</a>
           </span>
-          <ThemeToggle />
         </nav>
       </div>
     </header>

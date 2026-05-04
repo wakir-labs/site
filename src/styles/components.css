@@ -557,30 +557,13 @@ pre code {
 
 /* -------------------------------------------------------------------------
  * Theme toggle
- * ------------------------------------------------------------------------- */
-
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-muted);
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-block);
-  transition: var(--transition-color);
-  font-feature-settings: "tnum";
-  line-height: 1;
-}
-
-.theme-toggle:hover,
-.theme-toggle:focus-visible {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.theme-toggle__icon {
-  display: inline-block;
-}
+ * -------------------------------------------------------------------------
+ * Removed 2026-05-04: TDDDG §25 (Austria) bars persisting a theme choice
+ * in localStorage without consent. Until a cookie-banner decision lands,
+ * theme follows OS preference via `@media (prefers-color-scheme: light)`
+ * in tokens.css. The component file ThemeToggle.astro was deleted; this
+ * marker stays so the next contributor finds the rationale.
+ */
 
 /* -------------------------------------------------------------------------
  * Definition lists (ADR-fields, About metadata)
