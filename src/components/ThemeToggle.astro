@@ -1,0 +1,102 @@
+---
+/**
+ * ThemeToggle — light/dark mode switch (session-scoped).
+ *
+ * Storage model (2026-05-04):
+ *   - Initial mode: read from sessionStorage["theme"] if present,
+ *     else fall back to the OS preference via `prefers-color-scheme`.
+ *   - On click: toggle light <-> dark, write sessionStorage["theme"],
+ *     set `data-theme` on <html>.
+ *   - sessionStorage is wiped when the tab/window is closed, so the
+ *     persistence is transient ("session only"). No localStorage,
+ *     no cookie, no fingerprint surface.
+ *
+ * Why sessionStorage and not localStorage:
+ *   The Austrian TDDDG §25 (and the ePrivacy regime it transposes)
+ *   treats localStorage of a non-essential preference as a storage
+ *   operation requiring consent. A purely transient, session-scoped
+ *   write of an explicit user preference falls into the grey zone
+ *   that BfDI guidance and CJEU case law on session persistence
+ *   accept without a consent banner. ADR-0030 captures the rationale.
+ *
+ * Why no <head>-blocking pre-render bootstrap:
+ *   The previous (localStorage) variant ran a synchronous inline
+ *   script in <head> to set data-theme before first paint, avoiding
+ *   FOUC. We deliberately do not re-introduce that pattern here:
+ *   the legitimate-purpose argument for sessionStorage is strongest
+ *   when the read happens in a component script (post-DOM, deferred)
+ *   rather than in a head-blocking context. If a FOUC is visible
+ *   when reloading a tab that previously toggled to a theme
+ *   different from the OS, document it — do not paper over it with
+ *   a head-blocking script.
+ */
+---
+
+<button
+  class="theme-toggle"
+  type="button"
+  aria-label="Toggle light or dark mode"
+  data-theme-toggle
+>
+  <span class="theme-toggle__icon" aria-hidden="true" data-theme-toggle-icon>
+    moon
+  </span>
+</button>
+
+<script is:inline>
+  (function () {
+    var btn = document.querySelector("[data-theme-toggle]");
+    if (!btn) return;
+    var icon = btn.querySelector("[data-theme-toggle-icon]");
+    var root = document.documentElement;
+
+    function osPrefersLight() {
+      try {
+        return window.matchMedia("(prefers-color-scheme: light)").matches;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function readStored() {
+      try {
+        var v = sessionStorage.getItem("theme");
+        return v === "light" || v === "dark" ? v : null;
+      } catch (e) {
+        // Storage disabled / SecurityError in some embedded contexts.
+        return null;
+      }
+    }
+
+    function writeStored(theme) {
+      try {
+        sessionStorage.setItem("theme", theme);
+      } catch (e) {
+        // Storage disabled — ignore, click still updates the in-page state.
+      }
+    }
+
+    function setIcon(theme) {
+      if (icon) icon.textContent = theme === "light" ? "sun" : "moon";
+    }
+
+    // Initial sync. If sessionStorage already has a value (e.g. after a
+    // same-tab reload), apply it; otherwise leave data-theme unset so the
+    // CSS prefers-color-scheme media query keeps governing the look.
+    var stored = readStored();
+    if (stored) {
+      root.dataset.theme = stored;
+      setIcon(stored);
+    } else {
+      setIcon(osPrefersLight() ? "light" : "dark");
+    }
+
+    btn.addEventListener("click", function () {
+      var current = root.dataset.theme || (osPrefersLight() ? "light" : "dark");
+      var next = current === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      writeStored(next);
+      setIcon(next);
+    });
+  })();
+</script>
