@@ -40,13 +40,17 @@ const {
   </div>
   <p class="adr-box__summary">{summary}</p>
   {
-    verifyUrl && (
+    /* Render the "Verified on Bitcoin" line whenever a block is known —
+       independent of whether a verifyUrl is provided. The proof itself is
+       checkable against any Bitcoin explorer; the URL is only a convenience
+       link to opentimestamps.org. (link-audit 2026-05-04) */
+    verifyBlock && (
       <div class="adr-box__verify">
         <span>
           <span class="adr-box__verify-mark">&check;</span> Verified on Bitcoin
-          {verifyBlock && <> (block #{verifyBlock}{verifyDate && <>, {verifyDate}</>})</>}
+          (block #{verifyBlock}{verifyDate && <>, {verifyDate}</>})
         </span>
-        <a href={verifyUrl} rel="external">{verifyUrl}</a>
+        {verifyUrl && <a href={verifyUrl} rel="external">{verifyUrl}</a>}
       </div>
     )
   }

@@ -6,7 +6,11 @@ import NewsletterCTA from "../components/NewsletterCTA.astro";
 
 /* Featured/pinned post — visually identical to others (Comms-§4 disputable,
  * CEO-decision 2026-05-04: no FEATURED badge). First in chronological order
- * for ~4–6 weeks, then rotates. */
+ * for ~4–6 weeks, then rotates.
+ *
+ * 2026-05-04 link-audit: removed stub entry for /how-we-write-adrs/ — page
+ * does not exist yet (only draft in projects/comms/drafts/). Re-add when the
+ * post lands as a real /pages/ entry. */
 const posts = [
   {
     date: "2026-05-XX",
@@ -16,13 +20,6 @@ const posts = [
     desc:
       "Naming-as-methodology — five rounds, fifty candidates, one verifiable trail.",
     featured: true,
-  },
-  {
-    date: "2026-05-XX",
-    readMin: 6,
-    title: "How we write ADRs",
-    href: "/how-we-write-adrs/",
-    desc: "Architectural decisions as a content type.",
   },
 ];
 ---
@@ -34,8 +31,8 @@ const posts = [
     subhead="A framework for AI-first organizations. Open source. Audit-anchored to Bitcoin. Operated in public."
     primaryHref="/why-we-are-wakir-labs/"
     primaryLabel="Read the framework intro"
-    secondaryHref="https://wakirlabs.beehiiv.com/subscribe"
-    secondaryLabel="Subscribe to Field Notes"
+    secondaryHref="/rss.xml"
+    secondaryLabel="Follow via RSS"
   />
 
   <section class="features" aria-label="What Wakir Labs is">
@@ -51,8 +48,8 @@ const posts = [
 
     <FeatureSection
       title="How we operate"
-      href="/proof-of-history-in-practice/"
-      linkLabel="Proof-of-history in practice"
+      href="/verify/"
+      linkLabel="How to verify a Wakir Labs commit"
     >
       Every decision is an ADR, anchored to Bitcoin via OpenTimestamps. The
       audit trail is the architecture, not bolt-on logging.

@@ -173,7 +173,9 @@ const articleJsonLd = ogType === "article"
           <a href={isEn ? "/about/" : "/de/about/"}>About</a>
           <a href={isEn ? "/verify/" : "/de/verify/"}>Verify</a>
           <a href="https://github.com/wakir-labs" rel="external">GitHub</a>
-          <a href="https://wakirlabs.beehiiv.com" rel="external">Field Notes</a>
+          {/* 2026-05-04 link-audit: Field Notes link removed —
+              wakirlabs.beehiiv.com is not reserved (403). Re-add once the
+              publishing channel is live. RSS stays as the working feed. */}
           <a href="/rss.xml">RSS</a>
         </nav>
         <p>&copy; {new Date().getFullYear()} Wakir Labs &middot; Apache 2.0 where applicable.</p>

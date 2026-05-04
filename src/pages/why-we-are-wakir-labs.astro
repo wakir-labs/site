@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
 import ADRBox from "../components/ADRBox.astro";
-import DiscussOnGitHub from "../components/DiscussOnGitHub.astro";
 import NewsletterCTA from "../components/NewsletterCTA.astro";
 
 /* Long-form essay stub — placeholder body until the W1 draft lands.
@@ -53,16 +52,21 @@ const description =
         candidates later, the answer was a word from Arabic legal usage.
       </p>
 
+      {/* 2026-05-04 link-audit: removed verifyUrl placeholder
+          (https://opentimestamps.org/info?digest=…) and href to
+          /decisions/0018-brand-name/ — neither resolves yet. The corporate
+          decisions/ tree is local to the supervisory board (see /verify/).
+          Block + date stay; they are independently checkable on any Bitcoin
+          explorer. Re-add verifyUrl + href once the public decisions tree
+          ships. */}
       <ADRBox
         id="0018"
         title="Brand name"
         status="Accepted"
         decided="2026-05-02"
         summary="Wakir Labs &mdash; from Arabic wakīl, an appointed representative. Rejects pop-AI agent semantics in favor of legal-agent semantics."
-        verifyUrl="https://opentimestamps.org/info?digest=…"
         verifyBlock="898241"
         verifyDate="2026-05-03"
-        href="/decisions/0018-brand-name/"
       />
 
       <h2>How the trail works</h2>
@@ -95,10 +99,10 @@ ots verify -f <(git rev-parse 8aa88b9 | xxd -r -p) \\
       <hr />
     </div>
 
-    <DiscussOnGitHub
-      href="https://github.com/wakir-labs/site/discussions"
-      title={title}
-    />
+    {/* 2026-05-04 link-audit: DiscussOnGitHub removed —
+        github.com/wakir-labs/site has Discussions disabled, the link 404s.
+        Pending Mira-decision: enable Discussions (Settings > Features) and
+        re-add, or replace with an Issues-based contact pattern. */}
 
     <NewsletterCTA variant="inline" />
 
