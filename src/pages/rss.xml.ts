@@ -41,9 +41,9 @@ const essays: EssayEntry[] = [
   {
     title: "Why we are Wakir Labs",
     description:
-      "Naming-as-methodology — five rounds, fifty candidates, one verifiable trail.",
+      "An Arabic word for an appointed agent gave us a name; an old discipline of writing things down gives us a method.",
     link: "/why-we-are-wakir-labs/",
-    date: "2026-05-03",
+    date: "2026-05-04",
   },
 ];
 

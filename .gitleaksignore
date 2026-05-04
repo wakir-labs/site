@@ -40,3 +40,10 @@ e6179284ba138534d200206df0e9cbfd13e41935:src/pages/verify.astro:bip39-mnemonic-b
 public/fonts/LICENSE-inter.txt:bip39-mnemonic-bare:22
 public/fonts/LICENSE-jetbrains-mono.txt:bip39-mnemonic-bare:22
 public/fonts/LICENSE-source-serif-4.txt:bip39-mnemonic-bare:22
+
+# 2026-05-04 — Engineering: false positive on essay prose body
+# (12+ lowercase common words triggering bip39-mnemonic-bare). The
+# offending run is "...the suffix tells the listener nothing except
+# that the company would like to ride a wave..." in the W1 essay.
+# Verified false positive.
+src/pages/why-we-are-wakir-labs.astro:bip39-mnemonic-bare:97

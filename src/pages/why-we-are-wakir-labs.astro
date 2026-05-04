@@ -3,106 +3,229 @@ import Base from "../layouts/Base.astro";
 import ADRBox from "../components/ADRBox.astro";
 import NewsletterCTA from "../components/NewsletterCTA.astro";
 
-/* Long-form essay stub — placeholder body until the W1 draft lands.
- * The point of this page in this sprint is the *template*: post header,
- * lead paragraph, body with H2/H3, ADR Box, code block, end-of-post stack
- * (Discuss, Newsletter), prev/next navigation. Replace body when the real
- * essay is wired through MDX or a content collection. */
+/**
+ * W1 essay — wired from the editorial draft. Replaces the 2026-05-03
+ * placeholder-body stub.
+ *
+ * Conventions:
+ *   - DiscussOnGitHub: disabled (Discussions on this repo are off; pending
+ *     editorial decision on enable vs. issues-based contact).
+ *   - ADRBox: ADR-0018 (brand name final, supersedes ADR-0002). `verifyUrl`
+ *     and `href` omitted until a public ADR tree ships; block + date stay
+ *     (independently checkable via any Bitcoin explorer).
+ *   - DE variant: separate page, not in this commit.
+ */
 
 const title = "Why we are Wakir Labs";
 const description =
-  "Naming-as-methodology — five rounds, fifty candidates, one verifiable trail.";
+  "An Arabic word for an appointed agent gave us a name; an old discipline of writing things down gives us a method.";
 ---
 
 <Base
   title={title}
   description={description}
   ogType="article"
-  publishedTime="2026-05-03"
+  publishedTime="2026-05-04"
 >
   <article class="essay">
     <header class="essay__header">
       <p class="essay__meta">
-        <span>2026-05-XX</span>
-        <span>8 min read</span>
-        <span>brand &middot; methodology</span>
+        <span>2026-05-04</span>
+        <span>6 min read</span>
+        <span>brand &middot; foundations &middot; accountability</span>
       </p>
       <h1 class="essay__title">{title}</h1>
       <p class="essay__lead">
-        We picked a name the way we will pick everything else: by writing the
-        decision down, signing it with a key, and stamping the signature into
-        Bitcoin. The name is the first artifact of the methodology.
+        Most companies pick a name and move on. We spent five rounds and
+        around fifty candidates on ours, and this essay records why &mdash;
+        not because the name is unusually clever, but because the choice
+        documents a decision we plan to keep making in public.
       </p>
     </header>
 
     <div class="essay__body">
-      <h2>The question</h2>
+      <h2>What &ldquo;Wakir&rdquo; actually means</h2>
       <p>
-        Most company names are picked in a brainstorm and approved by a
-        founder over coffee. That works fine right up until someone asks
-        <em>why</em>. We wanted a record of the why &mdash; not because we
-        expect challenge, but because the discipline of recording the why is
-        the point of the company.
+        <em>Wakir</em> comes from Arabic <em>wakīl</em> (وكيل). In classical
+        and modern legal Arabic it denotes an appointed representative
+        &mdash; a proxy, a deputy, an agent in the legal sense. Not the
+        AI-pop sense (&ldquo;an agent is a thing that does work for
+        you&rdquo;), but the older one: someone is named, someone is
+        accountable, and the relationship is documented.
+      </p>
+      <p>
+        That is the sense we wanted on the door. Most multi-agent frameworks
+        treat humans as an emergency exit &mdash; a fallback when the agents
+        get confused. We design the other way around. People are first-class
+        roles in the workflow, with their own primitives for approval,
+        hand-off, and audit. <em>Wakil</em> is the right word for what we
+        build because it forces the question we keep asking: <em>who is this
+        agent acting on behalf of, and how do we know?</em>
+      </p>
+      <p>
+        We did not pick the word because Arabic was exotic. We picked it
+        because it was precise. Latin, Greek, and Sanskrit roots were on the
+        list too, and most of them collapsed under the weight of existing
+        software brands &mdash; Latin and Greek are where the Eclipse and
+        Apache pools live; the USPTO is full of them. Arabic gave us a clean
+        semantic hit on &ldquo;agent&rdquo; and a clean live-verification
+        result. Both mattered.
       </p>
 
-      <p>
-        The brief was simple: a name that means something in the language of
-        the thing we build, that survives a trademark search, that sounds
-        like an archive instead of a launch. Five rounds and fifty
-        candidates later, the answer was a word from Arabic legal usage.
-      </p>
-
-      {/* 2026-05-04 link-audit: removed verifyUrl placeholder
-          (https://opentimestamps.org/info?digest=…) and href to
-          /decisions/0018-brand-name/ — neither resolves yet. The corporate
-          decisions/ tree is local to the supervisory board (see /verify/).
-          Block + date stay; they are independently checkable on any Bitcoin
-          explorer. Re-add verifyUrl + href once the public decisions tree
-          ships. */}
+      {/* ADR-0018 supersedes ADR-0002 (decided 2026-05-02). The decisions/
+          tree is not yet public; verifyUrl + href stay omitted until it
+          ships. Block + date are independently checkable on any Bitcoin
+          explorer. */}
       <ADRBox
         id="0018"
-        title="Brand name"
-        status="Accepted"
+        title="Brand name (final) — Wakir Labs"
+        status="Approved"
         decided="2026-05-02"
-        summary="Wakir Labs &mdash; from Arabic wakīl, an appointed representative. Rejects pop-AI agent semantics in favor of legal-agent semantics."
+        summary="Wakir Labs &mdash; from Arabic wakīl, an appointed representative. Rejects pop-AI agent semantics in favor of legal-agent semantics. Supersedes ADR-0002."
         verifyBlock="898241"
         verifyDate="2026-05-03"
       />
 
-      <h2>How the trail works</h2>
+      <h2>Why not &ldquo;AI Inc.&rdquo; or &ldquo;X Labs&rdquo;</h2>
       <p>
-        Every decision lands as an ADR. Every commit on the repository
-        carries a timestamp anchored in a Bitcoin block. The verification is
-        public:
+        The names we deliberately avoided are more revealing than the one we
+        picked.
+      </p>
+      <p>
+        We did not want <em>AI</em> in the name. There are roughly forty
+        companies named &ldquo;Something AI&rdquo; launched every quarter;
+        the suffix tells the listener nothing except that the company would
+        like to ride a wave. By the time anyone looks at us seriously, the
+        wave will be a different shape, and the name will read like a fossil.
+      </p>
+      <p>
+        We did not want a generic <em>Labs</em> without a distinct stem.
+        <em>Mistral Labs</em>, <em>Mantra Labs</em>, <em>Manifold Labs</em>
+        &mdash; perfectly good companies, indistinguishable in a paragraph.
+        <em>Wakir</em> is distinctive enough to carry <em>Labs</em> without
+        the suffix becoming the whole brand.
+      </p>
+      <p>
+        We did not want a Latin compound (<em>Trovus</em>, <em>Vortus</em>,
+        <em>Provex</em>, <em>Trovex</em>). We tried; they all bumped into
+        existing software companies in adjacent fields. There is no point in
+        picking a name your future GitHub-org clashes with on day one. We
+        verified that each candidate failed live, with a real search, before
+        moving on.
+      </p>
+      <p>
+        We did not want a metaphor we would have to explain in every
+        conversation. &ldquo;Wakir&rdquo; needs one sentence of etymology
+        and an audio clip. After that, it is a name, not an argument.
       </p>
 
-      <pre><code class="language-bash">{`# In a clone of the repo:
-ots verify -f <(git rev-parse 8aa88b9 | xxd -r -p) \\
-  meta/timestamps/8aa88b9.ots`}</code></pre>
-
+      <h2>What &ldquo;accountable multi-agent systems&rdquo; means in practice</h2>
       <p>
-        The output names the Bitcoin block that attests the commit existed
-        at or before its mining time. No trust in us required &mdash; only
-        in Bitcoin and the OpenTimestamps calendar servers, which only sign,
-        never back-date.
+        The tagline on our cover is <em>Accountable multi-agent systems, a
+        framework for AI-first organizations.</em> That is a thing we have
+        to cash, not just print. Three concrete implications follow:
+      </p>
+      <p>
+        <strong>Identity-first agents.</strong> Every agent in our framework
+        has an identity that is more than a string. It is signed, verifiable,
+        and tied to a defined set of capabilities. You can ask, of any
+        action in the system, <em>which agent did this, what was it allowed
+        to do, and how do I prove that?</em> &mdash; and get an answer that
+        does not require trusting our database. The cryptographic mechanics
+        get their own posts; the design choice does not.
+      </p>
+      <p>
+        <strong>Humans as a typed role, not an emergency.</strong> A workflow
+        that has no defined human role is, in our framework, a bug.
+        <em>Approval</em>, <em>handoff</em>, <em>clarification</em>,
+        <em>review</em> are primitives with types and contracts, not Slack
+        workflows we hope someone will follow. If you want a fully autonomous
+        agent loop, you can write one &mdash; but you have to opt out of the
+        human role explicitly, which is an audit event in itself.
+      </p>
+      <p>
+        <strong>Audit trail as a first-class kernel primitive, not bolt-on
+        logging.</strong> Every action &mdash; agent or human &mdash; emits
+        an event into a stream that is the system of record. The stream is
+        part of the public surface of the framework. The logging <em>is</em>
+        the architecture, not a layer added at the end. This is what lets us
+        anchor decisions in OpenTimestamps and make the kind of belastbare
+        claims that compliance officers actually accept.
+      </p>
+      <p>
+        None of this is novel in isolation. Distributed systems people have
+        been making this argument for twenty years. What is novel is treating
+        these properties as the <em>first</em> thing the framework provides,
+        instead of the last thing a customer asks for.
       </p>
 
-      <h2>What the name commits us to</h2>
+      <h2>What &ldquo;Labs&rdquo; buys us</h2>
       <p>
-        <em>Wakil</em> in Arabic legal use means an appointed representative
-        with bounded authority. That is the ontology of our framework: every
-        agent is appointed, every agent has a defined scope, and the
-        relationship is documented. The name is the mission statement
-        compressed to two syllables.
+        <em>Labs</em> is doing real work in the name. It signals R&amp;D and
+        continuous iteration, not &ldquo;we shipped a product, now we sell
+        it.&rdquo; That is consistent with how we plan to operate: an
+        immutable documentation layer (every architectural decision, every
+        postmortem, every failed experiment recorded with timestamp and
+        signature), a publication cadence of several substantial pieces a
+        week, and a willingness to publish tools we tried and dropped
+        alongside tools we kept.
       </p>
+      <p>
+        A company whose method is <em>write everything down and time-stamp
+        it</em> is closer in spirit to a research lab than to a SaaS shop.
+        We did not want to call ourselves a research lab &mdash; we are not
+        in the business of papers. But we wanted the suffix that says: there
+        is a research practice in here, and it is on purpose.
+      </p>
+
+      <h2>How we will use the name</h2>
+      <p>Practical, for the record:</p>
+      <ul>
+        <li>
+          Canonical written form: <em>Wakir Labs</em>. First mention in any
+          material, written out in full.
+        </li>
+        <li>
+          Short form: <em>Wakir</em>. Once context is set &mdash; in
+          compounds like <em>the Wakir framework</em>, <em>the Wakir
+          platform</em> &mdash; <em>Wakir</em> alone is fine.
+        </li>
+        <li>
+          Pronunciation: <em>Wa-keer Labs</em> in English, <em>Wa-kir
+          Labs</em> in German. There is a phonetic note on every cover
+          surface where a first-time listener is likely to land.
+        </li>
+        <li>
+          Domain: <code>wakirlabs.com</code>. Reserve domains exist;
+          canonical address is the .com. We do not run a parallel presence
+          on a second domain.
+        </li>
+        <li>
+          Repos: <code>github.com/wakir-labs/&lt;component&gt;</code>. No
+          brand repetition (<code>wakir-labs/wakir-framework</code> is
+          redundant; <code>wakir-labs/framework</code> is enough).
+        </li>
+      </ul>
+      <p>
+        That is the brand surface. The substance is everything we publish,
+        every commit we anchor, every ADR we expose. The name is a promise;
+        the rest of this site is the receipts.
+      </p>
+      <p>
+        We will sign things &mdash; <em>Wakir Labs Editorial</em> on essays,
+        individual names where appropriate, signed commits everywhere.
+        <em>Wakil</em> means &ldquo;the one named to act.&rdquo; That is the
+        standard we are holding ourselves to.
+      </p>
+
+      <p class="essay__signoff">&mdash; Wakir Labs Editorial</p>
 
       <hr />
     </div>
 
-    {/* 2026-05-04 link-audit: DiscussOnGitHub removed —
-        github.com/wakir-labs/site has Discussions disabled, the link 404s.
-        Pending Mira-decision: enable Discussions (Settings > Features) and
-        re-add, or replace with an Issues-based contact pattern. */}
+    {/* DiscussOnGitHub disabled — Discussions on this repo are off
+        (link-audit 2026-05-04). Re-add after editorial decision on
+        enable vs. issues-based contact-pattern. */}
 
     <NewsletterCTA variant="inline" />
 
