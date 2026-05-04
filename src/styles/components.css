@@ -504,6 +504,31 @@
   margin-block-start: var(--space-1);
 }
 
+.newsletter__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: baseline;
+  margin-block-start: var(--space-1);
+}
+
+.newsletter__cta--secondary {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.newsletter__legal {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  line-height: var(--lh-relaxed);
+  margin: var(--space-2) 0 0;
+}
+
+.newsletter__legal a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 /* Compact variant for footer */
 .newsletter--compact {
   padding: var(--space-3);

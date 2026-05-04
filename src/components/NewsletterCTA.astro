@@ -2,27 +2,44 @@
 /**
  * NewsletterCTA — newsletter / feed link block.
  *
- * Per ADR-0024 + editorial decision 2026-05-04:
- *   - No own capture, no email input, no tracking pixel.
- *   - External link only.
- *   - Two placements:
- *       variant="inline"  — at end of long-form essay (compact one-liner).
- *       variant="footer"  — site-footer area subscribe block.
+ * Per ADR-0024 (Beehiiv launch on the Free tier), 2026-05-04: ship two
+ * CTAs side-by-side.
+ *   1. Subscribe via Beehiiv (external link to wakirlabs.beehiiv.com).
+ *   2. Follow via RSS (on-site /rss.xml).
  *
- * 2026-05-04 link-audit: the planned Beehiiv subdomain
- * (https://wakirlabs.beehiiv.com) returns 403 / is not reserved. Until the
- * publication is live, link the on-site RSS feed instead. Wording adapted
- * to be honest about the state. Pending Mira-decision on the publishing
- * channel (Beehiiv reservation vs. alternative provider). */
+ * Why an external link instead of an embedded form:
+ *
+ *   The Beehiiv embed snippet is a JavaScript loader that injects an
+ *   iframe and runs Beehiiv platform code on our domain. Beehiiv platform
+ *   sets cookies and supports third-party trackers (Meta Pixel, GA, etc.)
+ *   depending on form configuration. That conflicts with brand-guide §9
+ *   ("no trackers, no third-party analytics") and would force a cookie
+ *   banner. We refuse that trade-off.
+ *
+ *   An external-link CTA does not load any third-party code on our site.
+ *   The user clicks through to wakirlabs.beehiiv.com, where Beehiiv's own
+ *   GDPR/CCPA flow applies — that is Beehiiv's surface, not ours.
+ *
+ *   A future native form (no iframe, custom HTML POSTing to the Beehiiv
+ *   public subscription endpoint via a Cloudflare Worker proxy) is a
+ *   follow-up; tracked in our internal ADR queue.
+ *
+ * Two placements:
+ *   variant="inline"  — at end of long-form essay (compact one-liner).
+ *   variant="footer"  — site-footer area subscribe block.
+ */
 
 interface Props {
   variant?: "inline" | "footer";
-  /** Override the link target. Defaults to the on-site RSS feed. */
+  /** Override the Beehiiv subscribe URL. Defaults to the live publication. */
+  subscribeUrl?: string;
+  /** Override the RSS feed URL. Defaults to the on-site /rss.xml. */
   feedUrl?: string;
 }
 
 const {
   variant = "inline",
+  subscribeUrl = "https://wakirlabs.beehiiv.com/subscribe",
   feedUrl = "/rss.xml",
 } = Astro.props;
 ---
@@ -31,24 +48,52 @@ const {
   variant === "inline" ? (
     <aside class="newsletter newsletter--compact" aria-label="Newsletter">
       <p class="newsletter__desc">
-        This was a long essay. The weekly Field Notes newsletter is in setup —
-        for now, follow new posts via the RSS feed.
+        Field Notes — a weekly post from Wakir Labs.
       </p>
-      <a class="newsletter__cta" href={feedUrl}>
-        Follow via RSS &rarr;
-      </a>
+      <div class="newsletter__actions">
+        <a
+          class="newsletter__cta"
+          href={subscribeUrl}
+          rel="noopener external"
+        >
+          Subscribe by email &rarr;
+        </a>
+        <a class="newsletter__cta newsletter__cta--secondary" href={feedUrl}>
+          Or follow via RSS
+        </a>
+      </div>
+      <p class="newsletter__legal">
+        Email signup is hosted by beehiiv with double opt-in. See our
+        <a href="/privacy/">privacy notice</a> for details.
+      </p>
     </aside>
   ) : (
     <aside class="newsletter" aria-label="Newsletter">
-      <div class="newsletter__label">Field Notes &mdash; the weekly newsletter</div>
+      <div class="newsletter__label">
+        Field Notes &mdash; the weekly newsletter
+      </div>
       <p class="newsletter__desc">
-        Field Notes will publish ~600 words every Thursday once the newsletter
-        infrastructure is live. Until then, the RSS feed carries every new
-        post on this site.
+        Around 600 words every Thursday from the engine room of Wakir
+        Labs. Three to five things we learned, with links to the
+        long-form posts.
       </p>
-      <a class="newsletter__cta" href={feedUrl}>
-        Follow via RSS &rarr;
-      </a>
+      <div class="newsletter__actions">
+        <a
+          class="newsletter__cta"
+          href={subscribeUrl}
+          rel="noopener external"
+        >
+          Subscribe by email &rarr;
+        </a>
+        <a class="newsletter__cta newsletter__cta--secondary" href={feedUrl}>
+          Or follow via RSS
+        </a>
+      </div>
+      <p class="newsletter__legal">
+        Signup is hosted by beehiiv with double opt-in. We never load
+        beehiiv scripts on this domain — your visit here stays
+        cookie-free. See the <a href="/privacy/">privacy notice</a>.
+      </p>
     </aside>
   )
 }
