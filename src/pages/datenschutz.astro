@@ -1,0 +1,223 @@
+---
+import Base from "../layouts/Base.astro";
+
+const title = "Privacy Notice";
+const description =
+  "How wakirlabs.com handles personal data, under GDPR Art. 13 and § 25 TDDDG.";
+---
+
+<Base title={title} description={description}>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Privacy Notice</h1>
+      <p class="essay__lead">
+        How <code>wakirlabs.com</code> and the Wakir Labs newsletter
+        handle personal data, under GDPR Art. 13 and § 25 TDDDG. The
+        <a href="/de/datenschutz/">German version</a> is the legally
+        binding text; this English page is a reading aid for
+        international visitors.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>Controller</h2>
+      <p>
+        Controller within the meaning of GDPR Art. 4 (7):
+      </p>
+      <p>
+        [FIRMA]<br />
+        [GESCHAEFTSADRESSE_STRASSE]<br />
+        [PLZ_STADT]<br />
+        Germany<br />
+        Email: <a href="mailto:hello@wakirlabs.com">hello@wakirlabs.com</a>
+      </p>
+      <p>
+        Represented by: [GESCHAEFTSFUEHRER_KLARNAME]. Full provider
+        information: <a href="/impressum/">Imprint</a>.
+      </p>
+
+      <h2>Data we process when you visit this site</h2>
+
+      <h3>Server logs (Cloudflare Pages hosting)</h3>
+      <p>
+        This site is hosted on Cloudflare Pages. When you load a page,
+        Cloudflare receives the following technical data, which is
+        necessary to deliver the page to you:
+      </p>
+      <ul>
+        <li>IP address</li>
+        <li>Date and time of request</li>
+        <li>Requested URL and HTTP status code</li>
+        <li>User agent (browser and operating system)</li>
+        <li>Referrer (if your browser sends one)</li>
+      </ul>
+      <p>
+        Legal basis: GDPR Art. 6 (1) (f) — legitimate interest in
+        delivering and securing the website (defending against attacks,
+        diagnostic logs).
+      </p>
+      <p>
+        Cloudflare acts as a processor under GDPR Art. 28. The data
+        processing agreement we have entered into with Cloudflare is
+        archived in our compliance file
+        (<a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          dpa-snapshots/MANIFEST.md
+        </a>;
+        Cloudflare DPA reference:
+        <a href="https://www.cloudflare.com/cloudflare-customer-dpa/" rel="external">
+          cloudflare.com/cloudflare-customer-dpa
+        </a>).
+      </p>
+
+      <h3>Local storage (theme preference)</h3>
+      <p>
+        When you toggle between dark and light mode, your choice is
+        stored in your browser's <code>sessionStorage</code> under the
+        key <code>theme</code>. No data leaves your browser. Legal basis
+        under § 25 (2) TDDDG: storage strictly necessary to provide the
+        function explicitly requested by you (the theme toggle).
+      </p>
+      <p>
+        We do not set advertising cookies. We do not load third-party
+        analytics. There is no consent banner because there is nothing
+        requiring consent.
+      </p>
+
+      <h2>Newsletter (Beehiiv)</h2>
+      <p>
+        If you subscribe to the Wakir Labs newsletter (<em>Field Notes</em>),
+        we process the email address you submit and a confirmation
+        timestamp.
+      </p>
+      <ul>
+        <li>
+          <strong>Purpose:</strong> sending the newsletter you
+          subscribed to.
+        </li>
+        <li>
+          <strong>Legal basis:</strong> GDPR Art. 6 (1) (a) — your
+          explicit consent, given via double opt-in.
+        </li>
+        <li>
+          <strong>Double opt-in:</strong> after submitting your
+          address, you receive a confirmation email. Your subscription
+          becomes active only when you confirm via the link.
+        </li>
+        <li>
+          <strong>Retention:</strong> until you unsubscribe. Every
+          newsletter contains a one-click unsubscribe link.
+        </li>
+      </ul>
+      <p>
+        Newsletter delivery is handled by beehiiv, Inc. (US, New York)
+        as a processor under GDPR Art. 28. The data processing addendum
+        we have entered into with Beehiiv is archived in our compliance
+        file (<a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          dpa-snapshots/MANIFEST.md
+        </a>; Beehiiv DPA reference:
+        <a href="https://www.beehiiv.com/dpa" rel="external">
+          beehiiv.com/dpa
+        </a>).
+      </p>
+      <p>
+        Transfers to the United States are covered by the EU-U.S. Data
+        Privacy Framework where applicable, and otherwise by Standard
+        Contractual Clauses (SCCs) included in the Beehiiv DPA, Schedule
+        A.
+      </p>
+
+      <h2>Processors at a glance</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Processor</th>
+            <th>Purpose</th>
+            <th>Country</th>
+            <th>Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cloudflare, Inc.</td>
+            <td>Pages hosting, DNS, edge delivery</td>
+            <td>USA</td>
+            <td>
+              <a href="https://www.cloudflare.com/cloudflare-customer-dpa/" rel="external">
+                DPA
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>beehiiv, Inc.</td>
+            <td>Newsletter sending and subscriber management</td>
+            <td>USA</td>
+            <td>
+              <a href="https://www.beehiiv.com/dpa" rel="external">
+                DPA
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The complete, time-stamped compliance file is at
+        <a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          projects/legal/dpa-snapshots/MANIFEST.md
+        </a>.
+      </p>
+
+      <h2>Your rights under GDPR</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li>
+          <strong>Access</strong> your personal data (Art. 15)
+        </li>
+        <li>
+          <strong>Rectification</strong> of inaccurate data (Art. 16)
+        </li>
+        <li>
+          <strong>Erasure</strong> ("right to be forgotten", Art. 17)
+        </li>
+        <li>
+          <strong>Restriction</strong> of processing (Art. 18)
+        </li>
+        <li>
+          <strong>Data portability</strong> (Art. 20)
+        </li>
+        <li>
+          <strong>Object</strong> to processing based on legitimate
+          interests (Art. 21)
+        </li>
+        <li>
+          <strong>Withdraw consent</strong> at any time, without
+          affecting the lawfulness of prior processing (Art. 7 (3))
+        </li>
+      </ul>
+      <p>
+        To exercise any of these rights, write to
+        <a href="mailto:hello@wakirlabs.com">hello@wakirlabs.com</a>.
+      </p>
+      <p>
+        You also have the right to lodge a complaint with a supervisory
+        authority (Art. 77). The competent authority depends on the
+        controller's seat
+        ([AUFSICHTSBEHOERDE_NACH_GMBH_SITZ]).
+      </p>
+
+      <h2>No automated decision-making</h2>
+      <p>
+        We do not run automated individual decision-making, including
+        profiling, within the meaning of GDPR Art. 22.
+      </p>
+
+      <h2>Changes to this notice</h2>
+      <p>
+        Material changes to this privacy notice are reflected in the
+        site's commit history (<a href="/verify/">verifiable</a>). The
+        currently published version is always the version in effect.
+      </p>
+    </div>
+  </article>
+</Base>
+</content>
+</invoke>

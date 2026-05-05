@@ -45,6 +45,8 @@ const dePagesAvailable = new Set<string>([
   "/about/",
   "/verify/",
   "/404/",
+  "/impressum/",
+  "/datenschutz/",
 ]);
 
 // Normalise the EN-side path key (strip /de prefix when on DE page).
@@ -209,6 +211,14 @@ const articleJsonLd = ogType === "article"
               wakirlabs.beehiiv.com is not reserved (403). Re-add once the
               publishing channel is live. RSS stays as the working feed. */}
           <a href="/rss.xml">RSS</a>
+        </nav>
+        {/* Legal nav (ADR-0030, 2026-05-05). Separate <nav> so that screen
+            readers announce it as a distinct landmark from the primary
+            footer nav. DE-side links to the /de/ mirrors. Reuses the
+            existing site-footer__nav styling for visual consistency. */}
+        <nav class="site-footer__nav" aria-label={isEn ? "Legal" : "Rechtliches"}>
+          <a href={isEn ? "/impressum/" : "/de/impressum/"}>{isEn ? "Imprint" : "Impressum"}</a>
+          <a href={isEn ? "/datenschutz/" : "/de/datenschutz/"}>{isEn ? "Privacy" : "Datenschutz"}</a>
         </nav>
         <p>&copy; {new Date().getFullYear()} Wakir Labs &middot; Apache 2.0 where applicable.</p>
       </div>

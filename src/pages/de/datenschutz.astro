@@ -1,0 +1,229 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const title = "Datenschutzerklärung";
+const description =
+  "Wie wakirlabs.com mit personenbezogenen Daten umgeht — nach DSGVO Art. 13 und § 25 TDDDG.";
+---
+
+<Base title={title} description={description} lang="de">
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Datenschutzerklärung</h1>
+      <p class="essay__lead">
+        Wie <code>wakirlabs.com</code> und der Wakir-Labs-Newsletter mit
+        personenbezogenen Daten umgehen — nach DSGVO Art. 13 und § 25
+        TDDDG. Die deutsche Fassung ist die rechtlich verbindliche; eine
+        <a href="/datenschutz/">englische Lesehilfe</a> liegt parallel
+        vor.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>Verantwortlicher</h2>
+      <p>
+        Verantwortlicher im Sinne von DSGVO Art. 4 Nr. 7:
+      </p>
+      <p>
+        [FIRMA]<br />
+        [GESCHAEFTSADRESSE_STRASSE]<br />
+        [PLZ_STADT]<br />
+        Deutschland<br />
+        E-Mail: <a href="mailto:hello@wakirlabs.com">hello@wakirlabs.com</a>
+      </p>
+      <p>
+        Vertreten durch: [GESCHAEFTSFUEHRER_KLARNAME]. Vollständige
+        Anbieterkennzeichnung: <a href="/de/impressum/">Impressum</a>.
+      </p>
+
+      <h2>Daten, die beim Besuch dieser Website verarbeitet werden</h2>
+
+      <h3>Server-Logs (Cloudflare-Pages-Hosting)</h3>
+      <p>
+        Diese Website wird über Cloudflare Pages ausgeliefert. Beim
+        Aufruf einer Seite erhält Cloudflare die folgenden technischen
+        Daten, die zur Auslieferung der Seite zwingend erforderlich
+        sind:
+      </p>
+      <ul>
+        <li>IP-Adresse</li>
+        <li>Datum und Uhrzeit der Anfrage</li>
+        <li>Angefragte URL und HTTP-Statuscode</li>
+        <li>User-Agent (Browser und Betriebssystem)</li>
+        <li>Referrer (sofern vom Browser übermittelt)</li>
+      </ul>
+      <p>
+        Rechtsgrundlage: DSGVO Art. 6 Abs. 1 lit. f — berechtigtes
+        Interesse an der Auslieferung und Absicherung der Website
+        (Abwehr von Angriffen, Diagnose-Logs).
+      </p>
+      <p>
+        Cloudflare ist Auftragsverarbeiter nach DSGVO Art. 28. Der mit
+        Cloudflare geschlossene Auftragsverarbeitungsvertrag liegt in
+        unserer Compliance-Akte vor
+        (<a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          dpa-snapshots/MANIFEST.md
+        </a>;
+        Cloudflare-AVV-Referenz:
+        <a href="https://www.cloudflare.com/cloudflare-customer-dpa/" rel="external">
+          cloudflare.com/cloudflare-customer-dpa
+        </a>).
+      </p>
+
+      <h3>Lokaler Speicher (Theme-Einstellung)</h3>
+      <p>
+        Wenn Sie zwischen Dark- und Light-Mode umschalten, wird Ihre
+        Wahl im <code>sessionStorage</code> Ihres Browsers unter dem
+        Schlüssel <code>theme</code> abgelegt. Es verlassen keine Daten
+        Ihren Browser. Rechtsgrundlage nach § 25 Abs. 2 TDDDG: zur
+        Bereitstellung des von Ihnen ausdrücklich gewünschten Dienstes
+        (Theme-Umschalter) unbedingt erforderlich.
+      </p>
+      <p>
+        Wir setzen keine Werbe-Cookies und laden keine Drittanbieter-
+        Analytics. Es gibt kein Cookie-Banner, weil es nichts gibt, das
+        eine Einwilligung erfordert.
+      </p>
+
+      <h2>Newsletter (Beehiiv)</h2>
+      <p>
+        Wenn Sie den Wakir-Labs-Newsletter (<em>Field Notes</em>)
+        abonnieren, verarbeiten wir die von Ihnen eingegebene E-Mail-
+        Adresse sowie einen Bestätigungs-Zeitstempel.
+      </p>
+      <ul>
+        <li>
+          <strong>Zweck:</strong> Versand des von Ihnen abonnierten
+          Newsletters.
+        </li>
+        <li>
+          <strong>Rechtsgrundlage:</strong> DSGVO Art. 6 Abs. 1 lit. a
+          — Ihre ausdrückliche Einwilligung im Double-Opt-In-Verfahren.
+        </li>
+        <li>
+          <strong>Double-Opt-In:</strong> Nach Eingabe Ihrer Adresse
+          erhalten Sie eine Bestätigungs-E-Mail. Das Abonnement wird
+          erst aktiv, wenn Sie über den darin enthaltenen Link
+          bestätigen.
+        </li>
+        <li>
+          <strong>Speicherdauer:</strong> bis zur Abbestellung. Jeder
+          Newsletter enthält einen Ein-Klick-Abbestell-Link.
+        </li>
+      </ul>
+      <p>
+        Newsletter-Versand erfolgt über beehiiv, Inc. (USA, New York)
+        als Auftragsverarbeiter nach DSGVO Art. 28. Der mit Beehiiv
+        geschlossene Auftragsverarbeitungs-Nachtrag liegt in unserer
+        Compliance-Akte vor
+        (<a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          dpa-snapshots/MANIFEST.md
+        </a>; Beehiiv-AVV-Referenz:
+        <a href="https://www.beehiiv.com/dpa" rel="external">
+          beehiiv.com/dpa
+        </a>).
+      </p>
+      <p>
+        Übermittlungen in die Vereinigten Staaten erfolgen, soweit
+        anwendbar, auf Grundlage des EU-US-Data-Privacy-Framework, im
+        Übrigen auf Grundlage der im Beehiiv-AVV (Schedule A)
+        eingebundenen Standardvertragsklauseln (SCC).
+      </p>
+
+      <h2>Auftragsverarbeiter im Überblick</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Auftragsverarbeiter</th>
+            <th>Zweck</th>
+            <th>Sitz</th>
+            <th>Referenz</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cloudflare, Inc.</td>
+            <td>Pages-Hosting, DNS, Edge-Auslieferung</td>
+            <td>USA</td>
+            <td>
+              <a href="https://www.cloudflare.com/cloudflare-customer-dpa/" rel="external">
+                AVV
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>beehiiv, Inc.</td>
+            <td>Newsletter-Versand und Abonnenten-Verwaltung</td>
+            <td>USA</td>
+            <td>
+              <a href="https://www.beehiiv.com/dpa" rel="external">
+                AVV
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Die vollständige, zeitgestempelte Compliance-Akte liegt unter
+        <a href="https://github.com/wakir-labs/site/blob/main/projects/legal/dpa-snapshots/MANIFEST.md" rel="external">
+          projects/legal/dpa-snapshots/MANIFEST.md
+        </a>.
+      </p>
+
+      <h2>Ihre Rechte nach DSGVO</h2>
+      <p>Sie haben das Recht auf:</p>
+      <ul>
+        <li>
+          <strong>Auskunft</strong> über Ihre personenbezogenen Daten
+          (Art. 15)
+        </li>
+        <li>
+          <strong>Berichtigung</strong> unrichtiger Daten (Art. 16)
+        </li>
+        <li>
+          <strong>Löschung</strong> („Recht auf Vergessenwerden",
+          Art. 17)
+        </li>
+        <li>
+          <strong>Einschränkung</strong> der Verarbeitung (Art. 18)
+        </li>
+        <li>
+          <strong>Datenübertragbarkeit</strong> (Art. 20)
+        </li>
+        <li>
+          <strong>Widerspruch</strong> gegen Verarbeitungen auf Basis
+          berechtigter Interessen (Art. 21)
+        </li>
+        <li>
+          <strong>Widerruf einer Einwilligung</strong> jederzeit, ohne
+          die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung zu
+          berühren (Art. 7 Abs. 3)
+        </li>
+      </ul>
+      <p>
+        Zur Ausübung dieser Rechte genügt eine formlose Mitteilung an
+        <a href="mailto:hello@wakirlabs.com">hello@wakirlabs.com</a>.
+      </p>
+      <p>
+        Sie haben außerdem das Recht, sich bei einer Aufsichtsbehörde
+        zu beschweren (Art. 77). Zuständige Behörde nach Sitz des
+        Verantwortlichen: [AUFSICHTSBEHOERDE_NACH_GMBH_SITZ].
+      </p>
+
+      <h2>Keine automatisierte Entscheidungsfindung</h2>
+      <p>
+        Es findet keine automatisierte Entscheidungsfindung im Einzelfall
+        einschließlich Profiling im Sinne von DSGVO Art. 22 statt.
+      </p>
+
+      <h2>Änderungen dieser Erklärung</h2>
+      <p>
+        Wesentliche Änderungen werden in der Commit-Historie dieser Site
+        dokumentiert (<a href="/de/verify/">verifizierbar</a>). Es gilt
+        jeweils die aktuell veröffentlichte Fassung.
+      </p>
+    </div>
+  </article>
+</Base>
+</content>
+</invoke>
