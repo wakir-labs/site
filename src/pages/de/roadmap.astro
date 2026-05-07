@@ -1,0 +1,238 @@
+---
+/**
+ * Roadmap (DE) — deutsche Spiegel-Page der Endkunden-Variante des
+ * Wakir-Labs-Bauplans. Substanzgleich zur EN-Page `/roadmap/` (Variante 1,
+ * Aufsichtsrats-approved 2026-05-07 ~12:50 CEST), übersetzt für den
+ * deutschsprachigen Surface, ohne Datums-Anker, ohne ADR-IDs, ohne
+ * interne Sprint- oder Phasen-Nummern.
+ *
+ * Schwester-Pages (DE):
+ *
+ *   - `/de/verify/`  — wie ein Wakir-Labs-Commit verifiziert wird
+ *   - `/de/about/`   — wer Wakir Labs ist und wie wir publizieren
+ *
+ * Die DE-Mirror für `/verifier/` und `/audit-trail/` sind Folge-Items
+ * desselben Sprint-Auftrags (O6); Cross-Refs auf die EN-Pages bleiben
+ * solange aktiv.
+ *
+ * Substanz-Quelle:
+ *   `infra/repos-skeleton/site/src/pages/roadmap.astro` (EN, Tag-5).
+ *   Wording auf dieser Page ist die approved Substanz, übersetzt
+ *   und an die Brand-Voice der bestehenden DE-Pages (`de/about`,
+ *   `de/verify`) angepasst.
+ *
+ * Brand-Disziplin:
+ *   - Brand-Guide §9: nur Rollen-Strings, keine Klarnamen, keine
+ *     Persona-Anzahl-Aussage. Die Roadmap nennt Systeme (Audit-Trail,
+ *     Identitäts-System, Capability-Tokens, Container-Orchestrator,
+ *     Persona-Engine), keine Personen.
+ *   - ADR-0048-16 Honesty-Pattern: jeder "Was als Nächstes"-Eintrag
+ *     ist als Build-Item beschrieben, nicht als fertiges Ergebnis.
+ *     Die Roadmap-Page ist ein Plan-Dokument, keine Launch-Ankündigung.
+ *   - Keine Datums-Anker im Fließtext (Aufsichtsrats-Direktive
+ *     2026-05-07: Endkunden-Variante ohne kalenderbezogene
+ *     Meilensteine). Reihenfolge nach Abhängigkeiten, nicht nach
+ *     Wochen oder Quartalen.
+ *   - Keine Hype-Adjektive, keine "trustless"-Plaketten, keine
+ *     Marketing-Pillen, keine Future-Proof-Behauptungen. Wir
+ *     beschreiben, was wir bauen; die Quittungen anderswo auf
+ *     der Site entscheiden, ob es funktioniert.
+ *   - Polkadot-Demut, Bitcoin-Disziplin: in Reihenfolge bauen, in
+ *     Reihenfolge ausliefern, in Reihenfolge verifizieren. Keine
+ *     Behauptung ohne Beleg.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
+ *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz
+ *     ist approved, DE-Wording ist Brand-Voice-Anpassung an die
+ *     bestehenden DE-Pages.
+ *   - Aufsichtsrats-Pre-Go-Live-Sichtung pending. Site-Push bleibt
+ *     dev-engineering-Hand; diese Page wird auf einem Feature-
+ *     Branch ausgeliefert.
+ */
+import Base from "../../layouts/Base.astro";
+import WakirBrandAssetCard from "../../components/WakirBrandAssetCard.astro";
+import NewsletterCTA from "../../components/NewsletterCTA.astro";
+
+const title = "Roadmap";
+const description =
+  "Was Wakir Labs heute betreibt, was als Nächstes kommt und was danach folgt. Endkunden-Sicht auf den Bauplan, in Reihenfolge, ohne Datums-Anker.";
+---
+
+<Base title={title} description={description} lang="de">
+  <article class="essay">
+    <header class="essay__header">
+      <p class="essay__meta">
+        <span>Roadmap</span>
+        <span>Plan, keine Ankündigung</span>
+      </p>
+      <h1 class="essay__title">Roadmap</h1>
+      <p class="essay__lead">
+        Was Wakir Labs heute betreibt, was als Nächstes auf dem Bauplan
+        steht und was danach folgt. Die Roadmap ist nach Abhängigkeiten
+        sortiert, nicht nach einem Kalender; die Reihenfolge unten ist
+        die Reihenfolge, in der wir ausliefern wollen. Dies ist ein
+        Plan-Dokument, keine Launch-Ankündigung.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>Was heute läuft</h2>
+
+      <p>
+        Wir betreiben eine Pipeline, in der jede Agenten-Aktion
+        signiert, an ein Capability-Token gebunden und stündlich an
+        die Bitcoin-Blockchain verankert wird. Eine externe
+        Reviewer:in kann ein Kommandozeilen-Werkzeug gegen ein
+        lokales Archiv laufen lassen und prüfen, ob ein gemeldetes
+        Ereignis Teil des bestätigten Audit-Trails ist. Erste Live-
+        Datenpunkte sind in diese Site eingebettet &mdash; ein
+        mehrstündiger Lauf mit vier unabhängigen Bitcoin-
+        Bestätigungen ist unten verlinkt.
+      </p>
+
+      <WakirBrandAssetCard
+        variant="medium"
+        crossReferenceHref="/audit-trail/"
+        crossReferenceLabel="Vollständige Audit-Trail-Timeline ansehen"
+      />
+
+      <p>
+        Daraus folgen zwei Lese-Oberflächen:
+        <a href="/verifier/">wie sich die Ausgabe eines einzelnen
+        Verifier-Laufs liest</a> für das Pro-Quittungs-Urteil sowie
+        <a href="/audit-trail/">die Audit-Trail-Timeline</a> für die
+        chronologische Liste der Artefakte, die die Runtime verankert
+        hat. Die DE-Versionen dieser beiden Seiten folgen im selben
+        Sprint.
+      </p>
+
+      <h2>Was als Nächstes kommt</h2>
+
+      <p>
+        Vier Build-Items, in Abhängigkeits-Reihenfolge. Jedes ist in
+        Arbeit; keines ist fertig. Die Roadmap-Page wird aktualisiert,
+        wenn ein Item landet.
+      </p>
+
+      <ul>
+        <li>
+          <strong>Verifier im Browser.</strong> Das Audit-Werkzeug
+          wird als kleine Web-Oberfläche zugänglich, ohne Kommando-
+          zeile. Eingabe: eine Ereignis-ID und ein lokales Archiv.
+          Ausgabe: die Block-Höhen, die das Ereignis tragen.
+        </li>
+        <li>
+          <strong>Identitäts-System produktionsreif.</strong> Jeder
+          Agent erhält einen stabilen Schlüssel und eine signierte
+          Persona-Definition mit deterministischem Hash. Eine
+          Persona-Engine kümmert sich um Spawn, Recovery und
+          Migration zwischen Runtime-Versionen.
+        </li>
+        <li>
+          <strong>Capability-Tokens mit Kompatibilität zu externen
+          Bibliotheken.</strong> Tokens tragen Caveats &mdash;
+          <em>nur in einer trusted-execution environment</em>,
+          <em>nur einmal</em>, <em>erst nach einem bestimmten
+          Zeitpunkt</em> &mdash; und sind mit einer öffentlich
+          gepflegten Bibliothek prüfbar, nicht nur mit unserer
+          eigenen.
+        </li>
+        <li>
+          <strong>Container-Orchestrator.</strong> Agenten laufen in
+          Containern, deren Start, Migration und Stop selbst Teil des
+          Audit-Trails sind.
+        </li>
+      </ul>
+
+      <h2>Cross-Organisations-Verifikation</h2>
+
+      <p>
+        Eine Organisation, die das System betreibt, verankert ihr
+        Audit-Substrat mit einem öffentlich auflösbaren DNS-Eintrag.
+        Eine zweite Organisation kann &mdash; ohne Vor-Vertrag, ohne
+        zentrales Register &mdash; den Audit-Trail der ersten
+        verifizieren. DNS und Bitcoin tragen die Vertrauens-Anker;
+        kein dritter Dienst sitzt dazwischen. Wir bauen den Resolver
+        dafür ins Substrat. Von außen werden nur Standard-Protokolle
+        gebraucht.
+      </p>
+
+      <h2>Tech-Spezifikation</h2>
+
+      <p>
+        Sobald die fünf Module &mdash; Audit-Trail, Identität,
+        Capability-Tokens, Container-Orchestrator, Persona-Engine
+        &mdash; stabil sind, friert ein v1-Whitepaper die
+        Spezifikation für externe Implementierer:innen ein. Davor
+        veröffentlichen wir ein Position-Paper, das die Module
+        beschreibt, ohne sich auf Spec-Text festzulegen &mdash; als
+        Substanz-Anker für frühe Reviewer:innen.
+      </p>
+
+      <h2>Onboarding für externe Operator-Organisationen</h2>
+
+      <p>Drei Reife-Stufen, in Reihenfolge:</p>
+
+      <ul>
+        <li>
+          <strong>Stufe 1.</strong> Eine erste externe Organisation
+          richtet die Pipeline self-hosted ein, mit unserer
+          praktischen Begleitung.
+        </li>
+        <li>
+          <strong>Stufe 2.</strong> Mehrere unabhängige
+          Organisationen betreiben eigene Instanzen parallel, jede
+          mit ihrem eigenen DNS-verankerten Federations-Dokument.
+          Cross-Organisations-Verifikation läuft als Routine.
+        </li>
+        <li>
+          <strong>Stufe 3.</strong> Onboarding ist dokumentiert und
+          funktioniert ohne unsere direkte Beteiligung. Federation
+          ist ein offenes Netzwerk, kein zentrales System.
+        </li>
+      </ul>
+
+      <h2>Selbst-Migration</h2>
+
+      <p>
+        Wir migrieren unsere eigene Organisation parallel auf das
+        Substrat, das wir bauen. Sobald das stabil läuft, wird der
+        alte Stack abgeschaltet. Wir essen, was wir kochen, bevor es
+        sonst jemand tut.
+      </p>
+
+      <h2>Phase 2 und danach</h2>
+
+      <p>
+        Federation ist nicht das Ende. Vertrauliche Ausführung,
+        Schlüssel-Rotation, Recovery-Pfade für verlorene Persona-
+        Schlüssel und Werkzeuge für externe Auditor:innen sind die
+        nächsten Schritte. Die Reihenfolge ergibt sich aus dem
+        tatsächlichen Bedarf der ersten Operator-Organisationen,
+        nicht aus unserem internen Plan.
+      </p>
+
+      <h2>Wie diese Seite arbeitet</h2>
+
+      <p>
+        Die Roadmap ist nach Abhängigkeiten sortiert. Wir setzen
+        keine Daten darauf &mdash; kalenderbezogene Meilensteine
+        verschieben sich, und ein veröffentlichter Verzug wird zu
+        einem Glaubwürdigkeits-Problem, das wir nicht brauchen. Wenn
+        ein Build-Item landet, wird diese Seite aktualisiert, und das
+        Artefakt erscheint auf
+        <a href="/audit-trail/">der Audit-Trail-Timeline</a>. Die
+        Timeline ist die Quittung; diese Seite ist der Plan.
+      </p>
+
+      <p>
+        <a href="/roadmap/">Read in English</a>.
+      </p>
+
+      <p class="essay__signoff">&mdash; Wakir Labs Editorial</p>
+    </div>
+
+    <NewsletterCTA variant="inline" />
+  </article>
+</Base>
