@@ -1,0 +1,187 @@
+---
+/**
+ * Audit-Trail Browser — public-facing chronological view of every
+ * artefact the runtime has anchored.
+ *
+ * Three primitive entry kinds in v0:
+ *
+ *   - OTS Bitcoin anchor: a Bitcoin tx that anchored a Merkle
+ *     commitment via OpenTimestamps; carries tx ids, block height,
+ *     per-calendar branch verdicts.
+ *   - WAT pin pack: a frozen artefact set with a SHA-256 manifest;
+ *     pins prevent silent drift across runtime refactors.
+ *   - Persona hash pin: a canonical-subset SHA-256 hash that pins a
+ *     persona-definition shape (frontmatter-canonical in-hash, body
+ *     out-of-hash); detects converter regressions.
+ *
+ * Sister page to `/verifier/`. The two pages cover different reading
+ * modes:
+ *
+ *   - `/verifier/`     — how to read the output of a single
+ *                        `wakir verify` run (one verdict, many receipts)
+ *   - `/audit-trail/`  — the timeline of artefacts the runtime has
+ *                        accumulated (many runs, many kinds, many
+ *                        verdicts)
+ *
+ * Provisional content. The runtime does not yet emit a real audit-
+ * trail JSON export; this page renders a build-time inlined sample
+ * that points at real artefacts produced today (Sprint-2 deliveries
+ * across `wirelang-eng`, `wat-eng`, `pengine`).
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G: micro-text review pending. Marketing-text below
+ *     stays factual and follows the established pattern (no hype, no
+ *     marketing-pill, no "trustless" badge).
+ *   - WAT-Manifest-v2 schema sync with `wat-eng`: this page is a
+ *     downstream consumer; any divergence between the rendered
+ *     fields and the real audit-trail JSON output needs a paired
+ *     edit on both sides.
+ *   - Persona-hash-pin schema sync with `pengine`: same shape — a
+ *     downstream consumer expectation, paired edit on divergence.
+ */
+import Base from "../layouts/Base.astro";
+import AuditTrailEntry from "../components/AuditTrailEntry.astro";
+import { sampleAuditTrail } from "../data/wakir-audit-trail-sample";
+
+const title = "Wakir audit trail";
+const description =
+  "Chronological view of every artefact the runtime has anchored: OTS Bitcoin anchors, WAT pin packs, persona hash pins.";
+---
+
+<Base title={title} description={description}>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Wakir audit trail</h1>
+      <p class="essay__lead">
+        Every artefact the runtime produces gets anchored. The audit
+        trail is the timeline of those anchors: Bitcoin transactions,
+        pin packs, and persona hashes, in reverse-chronological order.
+        This page renders a build-time inlined sample so a reviewer can
+        see the shape before the runtime emits a real audit-trail
+        export.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <p>
+        For reading the output of a single verifier run, see
+        <a href="/verifier/">how to read a Wakir verifier result</a>.
+        The page you are reading now is the timeline view — many runs,
+        many artefact kinds, many verdicts.
+      </p>
+
+      <h2>What the timeline contains</h2>
+
+      <p>
+        Three primitive entry kinds in this v0 surface:
+      </p>
+
+      <ul>
+        <li>
+          <strong>OTS Bitcoin anchor.</strong> A Bitcoin transaction
+          that anchored a Merkle commitment via OpenTimestamps. Carries
+          tx ids, block height, and per-calendar branch verdicts. A
+          fully finalised anchor has every calendar branch resolved to
+          the same Bitcoin block. A partial anchor has at least one
+          branch still aggregating. Block heights link to the public
+          block explorer.
+        </li>
+        <li>
+          <strong>WAT pin pack.</strong> A frozen artefact set with a
+          SHA-256 manifest. Pins prevent silent drift across runtime
+          refactors: a regression that changes the canonical shape of
+          a pinned artefact produces an explicit pin break.
+        </li>
+        <li>
+          <strong>Persona hash pin.</strong> A canonical-subset
+          SHA-256 hash that pins a persona-definition shape. The
+          frontmatter is canonical and inside the hash; the body is
+          outside. A persona-converter regression that drifts the
+          canonical subset throws a determinism error against the pin.
+        </li>
+      </ul>
+
+      <h2>The current sample</h2>
+
+      <p>
+        The entries below point at real artefacts produced on
+        Wakir-day 2026-05-07: the inter-agent NATS subject mapping
+        spec, the manifest-v2 verifier stub, the persona-converter
+        V9 pin, and Bitcoin anchors for the TV-2 and TV-3 audit-trail
+        runs. The data is build-time inlined from
+        <code>src/data/wakir-audit-trail-sample.ts</code>; the runtime
+        export that will produce this shape directly is in flight.
+      </p>
+
+      <ol class="wakir-audit-trail-list" aria-label="Audit trail timeline">
+        {sampleAuditTrail.map((entry) => (
+          <li class="wakir-audit-trail-list__item">
+            <AuditTrailEntry entry={entry} />
+          </li>
+        ))}
+      </ol>
+
+      <h2>Reading an OTS Bitcoin anchor entry</h2>
+
+      <ul>
+        <li>
+          <strong>Pin hash.</strong> For an OTS anchor, the pin hash
+          is the Bitcoin block hash that the OpenTimestamps commitment
+          resolved to. Display-shortened in the entry header; the full
+          hash is in the cell tooltip.
+        </li>
+        <li>
+          <strong>Block height.</strong> When every calendar branch
+          agrees on a single height (the common case), the height
+          links to the public block explorer. When branches diverge
+          or are still pending, the per-branch table tells the full
+          story.
+        </li>
+        <li>
+          <strong>Per-calendar branches.</strong> The same four public
+          OpenTimestamps calendars used elsewhere in the runtime:
+          <code>alice</code>, <code>bob</code>, <code>finney</code>,
+          <code>catallaxy</code>. Verdict is <code>ok</code> for a
+          finalised branch, <code>pending</code> for an aggregated-
+          but-not-yet-anchored branch, <code>rejected</code> for a
+          branch whose Merkle path or commit binding did not check
+          out.
+        </li>
+      </ul>
+
+      <h2>Reading a pin-pack entry</h2>
+
+      <p>
+        A pin pack lists the files that make up a frozen artefact set
+        and the canonical-shape pin that the runtime expects against
+        them. The entry shows the artefact filenames and line counts
+        as a structural sketch — the load-bearing content is the pin
+        hash itself, plus the test name that fails when the pin
+        breaks.
+      </p>
+
+      <h2>Reading a persona-hash-pin entry</h2>
+
+      <p>
+        A persona-hash-pin entry shows the canonical-subset SHA-256
+        and the named pin constants the runtime exports. A converter
+        regression that drifts the canonical subset throws a
+        determinism error that names the pin; the entry shows the test
+        that catches that drift. The verify command reproduces the
+        canonical-subset hash from a persona definition without
+        running the runtime.
+      </p>
+
+      <h2>What is not here yet</h2>
+
+      <p>
+        This is a v0 timeline view. It does not yet support filtering
+        by entry kind, search by hash, or pagination beyond the build-
+        time inlined sample. The runtime export that will feed a real
+        audit-trail JSON is in flight; once it lands, this page will
+        switch from a six-entry sample to the full timeline. Until
+        then, the sample is real but partial.
+      </p>
+    </div>
+  </article>
+</Base>
