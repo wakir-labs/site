@@ -15,6 +15,14 @@ interface Props {
   publishedTime?: string;
   /** Optional override for og:image; falls back to default share-card. */
   ogImage?: string;
+  /**
+   * Mark the page as internal-only: emits `<meta name="robots" content="noindex,nofollow">`,
+   * suppresses the canonical / OpenGraph / hreflang surface so search engines
+   * and social previews do not index the page. Used by internal-tooling pages
+   * (e.g. `/persona-inspector/`) that ship in the public Astro build but are
+   * not part of the marketing surface.
+   */
+  noindex?: boolean;
 }
 
 const {
@@ -25,6 +33,7 @@ const {
   ogType = "website",
   publishedTime,
   ogImage,
+  noindex = false,
 } = Astro.props;
 
 const isEn = lang === "en";
@@ -95,42 +104,55 @@ const articleJsonLd = ogType === "article"
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark light" />
-    <link rel="canonical" href={canonicalUrl} />
-
-    <!-- OpenGraph (Facebook/LinkedIn/Slack/Discord previews) -->
-    <meta property="og:site_name" content="Wakir Labs" />
-    <meta property="og:type" content={ogType} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:locale" content={ogLocale} />
-    {hasAlternate && (
-      <meta property="og:locale:alternate" content={ogLocaleAlt} />
+    {noindex ? (
+      /* Internal-only page: forbid indexing and following on every crawler
+         that honours the standard `robots` directive. We deliberately do
+         NOT emit canonical, OpenGraph, Twitter, or hreflang tags for these
+         pages — the page is not part of the marketing surface, and any
+         signal we'd give a crawler would be wrong. */
+      <meta name="robots" content="noindex,nofollow" />
+    ) : (
+      <link rel="canonical" href={canonicalUrl} />
     )}
-    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
 
-    <!-- Twitter / X card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
+    {!noindex && (
+      <>
+        <!-- OpenGraph (Facebook/LinkedIn/Slack/Discord previews) -->
+        <meta property="og:site_name" content="Wakir Labs" />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:locale" content={ogLocale} />
+        {hasAlternate && (
+          <meta property="og:locale:alternate" content={ogLocaleAlt} />
+        )}
+        {publishedTime && <meta property="article:published_time" content={publishedTime} />}
 
-    <!-- hreflang for EN/DE pairs. The EN<->DE alternate is only emitted when
-         a real translated page exists on disk (see `dePagesAvailable`).
-         Otherwise we'd point search engines at the CF-Pages 404-fallback,
-         which serves the home page with HTTP 200. -->
-    <link rel="alternate" hreflang={lang} href={canonicalUrl} />
-    {hasAlternate && (
-      <link
-        rel="alternate"
-        hreflang={isEn ? "de" : "en"}
-        href={new URL(altPath, Astro.site).toString()}
-      />
+        <!-- Twitter / X card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImageUrl} />
+
+        <!-- hreflang for EN/DE pairs. The EN<->DE alternate is only emitted when
+             a real translated page exists on disk (see `dePagesAvailable`).
+             Otherwise we'd point search engines at the CF-Pages 404-fallback,
+             which serves the home page with HTTP 200. -->
+        <link rel="alternate" hreflang={lang} href={canonicalUrl} />
+        {hasAlternate && (
+          <link
+            rel="alternate"
+            hreflang={isEn ? "de" : "en"}
+            href={new URL(altPath, Astro.site).toString()}
+          />
+        )}
+        <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).toString()} />
+      </>
     )}
-    <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).toString()} />
 
-    {articleJsonLd && (
+    {!noindex && articleJsonLd && (
       <script
         type="application/ld+json"
         set:html={JSON.stringify(articleJsonLd)}

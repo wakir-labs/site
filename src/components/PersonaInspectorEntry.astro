@@ -1,0 +1,84 @@
+---
+/**
+ * PersonaInspectorEntry — render a single persona-directory card on
+ * the internal-only `/persona-inspector/` page.
+ *
+ * Read-only structural sketch. No edit affordance, no client state.
+ * The page is internal-only (`<meta name="robots" content="noindex,
+ * nofollow">`) so this component can render slug + role + domain +
+ * activation status + persona-hash-pin constant + ADR id without any
+ * marketing-surface concerns.
+ *
+ * Brand-Guide §9 (still applies even on internal-only surfaces):
+ *   - role-strings only, no clear-names — the sample data file
+ *     enforces this; the component renders whatever the payload
+ *     gives it without injecting clear-names of its own
+ *   - no persona-count statement — the component renders one card
+ *     and never reads the parent list `length`
+ *   - factual verbs, no marketing-speak — kind labels and status
+ *     pills stay one-word
+ *
+ * Honesty path: the activation pill shows `active` or `in-activation`
+ * as-is. We do not soften an in-activation status to look active.
+ *
+ * Visual companion to `AuditTrailEntry.astro` and
+ * `VerifierResultCard.astro` — same chrome (border-radius, font
+ * stack, spacing), same `data-…` attribute pattern for variant
+ * styling, no new colour tokens.
+ */
+import type { PersonaInspectorEntry } from "../data/wakir-persona-inspector-sample";
+
+interface Props {
+  /** The persona-directory entry payload to render. */
+  entry: PersonaInspectorEntry;
+}
+
+const { entry } = Astro.props;
+
+/**
+ * Display label for the activation pill. One-word, factual.
+ */
+const statusLabel = (status: PersonaInspectorEntry["status"]): string =>
+  status === "active" ? "active" : "in activation";
+---
+
+<aside
+  class="wakir-persona-inspector-entry"
+  data-status={entry.status}
+  aria-label={`Persona directory entry: ${entry.slug}`}
+>
+  <header class="wakir-persona-inspector-entry__header">
+    <div class="wakir-persona-inspector-entry__heading">
+      <p class="wakir-persona-inspector-entry__slug">
+        <code>{entry.slug}</code>
+      </p>
+      <p class="wakir-persona-inspector-entry__role">{entry.role}</p>
+    </div>
+    <span
+      class="wakir-persona-inspector-entry__pill"
+      data-status={entry.status}
+      aria-label="Activation status"
+    >
+      {statusLabel(entry.status)}
+    </span>
+  </header>
+
+  <p class="wakir-persona-inspector-entry__domain">{entry.domain}</p>
+
+  <dl class="wakir-persona-inspector-entry__facts">
+    <div class="wakir-persona-inspector-entry__fact">
+      <dt>Hash-pin constant</dt>
+      <dd>
+        <code>{entry.hashPinConstant}</code>
+      </dd>
+    </div>
+    <div class="wakir-persona-inspector-entry__fact">
+      <dt>Constituting ADR</dt>
+      <dd>{entry.adr}</dd>
+    </div>
+  </dl>
+
+  {entry.note && (
+    <p class="wakir-persona-inspector-entry__note">{entry.note}</p>
+  )}
+</aside>

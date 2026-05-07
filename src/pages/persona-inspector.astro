@@ -1,0 +1,168 @@
+---
+/**
+ * Persona-Inspector — INTERNAL-ONLY directory of role-string slugs,
+ * functional roles, activation status, persona-hash-pin constants,
+ * and constituting ADRs.
+ *
+ * NOT A MARKETING SURFACE. The page is intentionally internal-only:
+ *
+ *   - `<Base noindex>` emits `<meta name="robots" content="noindex,
+ *     nofollow">` and suppresses canonical / OpenGraph / Twitter /
+ *     hreflang / JSON-LD tags so search engines and social previews
+ *     do not index this URL.
+ *   - The page renders role-string slugs only — never clear-names.
+ *     Brand-Guide §9 (blocklist path) applies to every public-Astro
+ *     surface, including pages that are nominally "internal".
+ *   - The page does NOT render a count statement ("we are N
+ *     personas"). The directory shows individual cards; any count
+ *     signal is opaque (ADR ids, not totals).
+ *
+ * Audience (per F3 = intern-only Phase-0 decision, Mira-Antwort
+ * 2026-05-07):
+ *   - Wakir-team reviewers checking persona configuration,
+ *     persona-hash-pin alignment with the persona-engine pin pack,
+ *     and ADR cross-references.
+ *   - Internal audit (`internal-audit` role) cross-referencing
+ *     activation ADRs against the wave-3 cohort.
+ *   - HR (`hr` role) verifying the activation-state surface against
+ *     the persona files.
+ *
+ * NOT for: external reviewers, marketing audience, third-party
+ * compliance auditors. Those audiences read `/verifier/`,
+ * `/audit-trail/`, and the position papers.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G: NOT triggered for an internal-only page in the
+ *     same way as marketing surfaces are. Brand-Guide §9 still
+ *     applies (role-strings only, no count). A Zone-G heads-up
+ *     remains good practice.
+ *   - Persona-engine schema sync (`persona-engine-eng` role): the
+ *     hash-pin constant name shown on each card is a downstream
+ *     consumer expectation; if the persona-engine renames the
+ *     constant, this surface needs a paired edit.
+ *
+ * Provisional content. The persona-engine does not yet emit a JSON
+ * directory that this page can consume directly; the data lives in
+ * `src/data/wakir-persona-inspector-sample.ts` as a build-time
+ * inlined fixture. When the persona-engine surface lands a real
+ * directory export, this page switches over.
+ */
+import Base from "../layouts/Base.astro";
+import PersonaInspectorEntry from "../components/PersonaInspectorEntry.astro";
+import { samplePersonaInspector } from "../data/wakir-persona-inspector-sample";
+
+const title = "Persona inspector (internal)";
+const description =
+  "Internal-only role-string directory: slug, functional role, activation status, persona-hash-pin constant, constituting ADR.";
+---
+
+<Base title={title} description={description} noindex>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Persona inspector</h1>
+      <p class="essay__lead">
+        An internal read-only view of the role-string directory. Each
+        card lists the inter-agent slug, the functional role, the
+        activation status, the persona-hash-pin constant the
+        persona-engine pins against, and the constituting ADR.
+      </p>
+      <p class="wakir-persona-inspector__internal-banner" role="note">
+        <strong>Internal-only surface.</strong> This page is not part
+        of the marketing surface; the response sets
+        <code>noindex,nofollow</code>. Reviewers reading externally
+        should use <a href="/verifier/">the verifier page</a> or
+        <a href="/audit-trail/">the audit trail</a> instead.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>How to read a card</h2>
+
+      <ul>
+        <li>
+          <strong>Slug.</strong> The single-word inter-agent
+          identifier. The same slug used in <code>subagent_type=…</code>,
+          in NATS subject names, and in cross-review references.
+        </li>
+        <li>
+          <strong>Role.</strong> The functional role descriptor in the
+          form used across the org (<code>dev-engineering</code>,
+          <code>wirelang-eng</code>, <code>frontend-eng</code>). Plain
+          functional descriptor; not a clear-name.
+        </li>
+        <li>
+          <strong>Domain.</strong> One sentence describing what the
+          role owns. Read off the persona files; kept short so a
+          reviewer can scan the directory at glance.
+        </li>
+        <li>
+          <strong>Activation status.</strong> <code>active</code> when
+          the role is delivering work today;
+          <code>in&nbsp;activation</code> when the persona file is
+          approved (ADR landed) but the agent has not yet been spawned
+          for productive output. Wave-3 activations carry the
+          <code>in&nbsp;activation</code> status until first delivery
+          lands.
+        </li>
+        <li>
+          <strong>Hash-pin constant.</strong> The named export of the
+          persona-engine that pins the canonical-subset SHA-256 of the
+          persona-definition file. The raw hash lives on
+          <a href="/audit-trail/">the audit trail</a>; the constant
+          name on each card keeps the inspector readable without
+          duplicating a hash that might drift across surfaces.
+        </li>
+        <li>
+          <strong>Constituting ADR.</strong> The architecture decision
+          that activated the role. Reviewers cross-reference governance
+          via these ADR ids.
+        </li>
+      </ul>
+
+      <h2>Directory</h2>
+
+      <p>
+        Cards are listed in the natural ADR-arrival order so the
+        directory reads the way the org grew, not alphabetically.
+      </p>
+
+      <ol class="wakir-persona-inspector-list" aria-label="Persona directory">
+        {samplePersonaInspector.map((entry) => (
+          <li class="wakir-persona-inspector-list__item">
+            <PersonaInspectorEntry entry={entry} />
+          </li>
+        ))}
+      </ol>
+
+      <h2>What is not here yet</h2>
+
+      <p>
+        This is a read-only structural sketch. It does not yet support
+        filtering by status, search by slug, or per-card expansion to
+        show the full persona-definition body. The persona-engine does
+        not yet emit a JSON directory export that this page can consume
+        directly; the data above is build-time inlined from
+        <code>src/data/wakir-persona-inspector-sample.ts</code> and
+        mirrors <code>scripts/lib/wakir-personas.txt</code> (single
+        source of truth for the role-string directory). When the
+        persona-engine surface lands a real directory export, this
+        page switches over. Until then, the cards above are real but
+        partial.
+      </p>
+
+      <h2>Why this page is internal-only</h2>
+
+      <p>
+        Brand-Guide §9 keeps the role-string directory off public
+        surfaces. A public version of this directory is therefore not
+        on the roadmap. The inspector ships internal-only:
+        <code>noindex,nofollow</code>, no canonical, no OpenGraph, no
+        hreflang. Outside readers use
+        <a href="/verifier/">the verifier</a> and
+        <a href="/audit-trail/">the audit trail</a> — both render
+        substance (Bitcoin anchors, pin packs, persona-hash pins)
+        without exposing the role-string directory.
+      </p>
+    </div>
+  </article>
+</Base>
