@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
 import FeatureSection from "../components/FeatureSection.astro";
 import NewsletterCTA from "../components/NewsletterCTA.astro";
+import WakirBrandAssetCard from "../components/WakirBrandAssetCard.astro";
 
 /* Featured/pinned post — visually identical to others (Comms-§4 disputable,
  * CEO-decision 2026-05-04: no FEATURED badge). First in chronological order
@@ -34,6 +35,14 @@ const posts = [
     secondaryHref="/rss.xml"
     secondaryLabel="Follow via RSS"
   />
+
+  {/* Substance marker — the recent multi-hour audit-trail run with all four
+      OpenTimestamps calendar branches finalised on Bitcoin. Short variant
+      keeps the home page light; the longer forms live on /about and
+      /why-we-are-wakir-labs. */}
+  <section class="container container--wide" aria-label="Latest verified audit trail">
+    <WakirBrandAssetCard variant="short" />
+  </section>
 
   <section class="features" aria-label="What Wakir Labs is">
     <FeatureSection

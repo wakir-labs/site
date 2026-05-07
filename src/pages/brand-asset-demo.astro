@@ -1,0 +1,54 @@
+---
+/**
+ * Brand-asset demo page — internal QA for the WakirBrandAssetCard component.
+ *
+ * Renders all three variants (short / medium / long) of the TV-2
+ * Bitcoin-anchored audit-trail asset side-by-side. This page is a
+ * developer fixture; it stays unlinked from the main navigation so
+ * search engines won't surface it as canonical content.
+ *
+ * Once the component is reviewed and approved (Comms Zone-G plus
+ * editorial pre-push approval), the actual marketing usages on `/`,
+ * `/about/`, and `/why-we-are-wakir-labs/` are the real surfaces.
+ */
+import Base from "../layouts/Base.astro";
+import WakirBrandAssetCard from "../components/WakirBrandAssetCard.astro";
+---
+
+<Base
+  title="Wakir Brand Asset Card — demo"
+  description="Internal QA fixture for the WakirBrandAssetCard component."
+>
+  <article class="container">
+    <h1>WakirBrandAssetCard — variant fixtures</h1>
+    <p>
+      Three variants of the same TV-2 Bitcoin-anchor datapoint. The
+      payload is build-time inlined from <code>src/data/wakir-brand-asset-tv-2.ts</code>.
+      No client-side data fetch, no animation, no live counter.
+    </p>
+
+    <h2>short</h2>
+    <p>
+      One-line inline marker for hero / inline contexts.
+    </p>
+    <WakirBrandAssetCard variant="short" />
+
+    <h2>medium</h2>
+    <p>
+      Multi-line factual block with per-hour-receipt block-height table.
+      Suitable for an <code>/about/</code> sub-section.
+    </p>
+    <WakirBrandAssetCard variant="medium" />
+
+    <h2>long</h2>
+    <p>
+      Medium block plus verify command and a cross-reference link.
+      Suitable for the closing block of an essay.
+    </p>
+    <WakirBrandAssetCard
+      variant="long"
+      crossReferenceHref="/verify/"
+      crossReferenceLabel="How to verify a Wakir Labs commit"
+    />
+  </article>
+</Base>

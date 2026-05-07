@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import ADRBox from "../components/ADRBox.astro";
 import NewsletterCTA from "../components/NewsletterCTA.astro";
+import WakirBrandAssetCard from "../components/WakirBrandAssetCard.astro";
 
 /**
  * W1 essay — wired from the editorial draft. Replaces the 2026-05-03
@@ -217,6 +218,20 @@ const description =
         <em>Wakil</em> means &ldquo;the one named to act.&rdquo; That is the
         standard we are holding ourselves to.
       </p>
+
+      <p>
+        Below is what that standard looks like as a concrete artefact: a
+        multi-hour audit-trail run with all four independent
+        OpenTimestamps calendars finalised on Bitcoin. The hashes are the
+        receipts, the block heights are the witnesses, the verify command
+        is the invitation.
+      </p>
+
+      <WakirBrandAssetCard
+        variant="long"
+        crossReferenceHref="/verify/"
+        crossReferenceLabel="How to verify a Wakir Labs commit"
+      />
 
       <p class="essay__signoff">&mdash; Wakir Labs Editorial</p>
 

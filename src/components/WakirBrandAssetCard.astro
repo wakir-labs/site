@@ -1,0 +1,194 @@
+---
+/**
+ * WakirBrandAssetCard — reusable embed for Wakir Bitcoin-anchored assets.
+ *
+ * Renders a substance-bearing card for a single brand-asset (currently
+ * the TV-2 multi-hour run, with TV-1 and future TV-N planned). Three
+ * format variants:
+ *
+ *   - "short"   — one-line marker for hero / inline contexts
+ *   - "medium"  — multi-line factual block with per-hour block heights
+ *   - "long"    — medium block + verify-command + cross-reference link
+ *
+ * Brand-Guide §9 (blocklist path):
+ *   - role-strings only, no persona / engineer names
+ *   - no internal workspace paths
+ *   - no persona-count statements
+ *
+ * Brand-Guide §4 / §7 (anti-marketing-speak):
+ *   - factual verbs, no hype adjectives
+ *   - block heights and hashes are the load-bearing content
+ *   - no animation, no live counter, no "trusted by Bitcoin"
+ *
+ * Brand-voice anchor (Comms Zone-G G-2): card-with-hash + status-pill +
+ * verify-link + submit-metadata. Long-tail-pending fallback wording
+ * stays honest. Pattern reusable for TV-1, TV-3, future assets.
+ */
+import type { BrandAssetTv2 } from "../data/wakir-brand-asset-tv-2";
+import { tv2 as defaultAsset } from "../data/wakir-brand-asset-tv-2";
+
+interface Props {
+  /** Format variant. Default "medium". */
+  variant?: "short" | "medium" | "long";
+  /** Override the asset payload. Defaults to the TV-2 close-out datapoint. */
+  asset?: BrandAssetTv2;
+  /** Optional href for the cross-reference link in the "long" variant. */
+  crossReferenceHref?: string;
+  /** Optional label for the cross-reference link in the "long" variant. */
+  crossReferenceLabel?: string;
+  /** Optional override of the explorer base for block-height links. */
+  explorerBlockBaseUrl?: string;
+}
+
+const {
+  variant = "medium",
+  asset = defaultAsset,
+  crossReferenceHref,
+  crossReferenceLabel,
+  explorerBlockBaseUrl = "https://blockstream.info/block-height/",
+} = Astro.props;
+
+/**
+ * 4-of-4-finalised assertion: every receipt has exactly four branches,
+ * one per calendar. Computed at build-time for honesty — if a future
+ * asset is partial, the variant text downgrades automatically.
+ */
+const allFinalised = asset.receipts.every(
+  (r) => r.branches.length === asset.calendarCount,
+);
+const finalisedReceiptCount = asset.receipts.filter(
+  (r) => r.branches.length === asset.calendarCount,
+).length;
+
+const explorerHref = (height: number): string =>
+  `${explorerBlockBaseUrl}${height}`;
+---
+
+<aside
+  class={`wakir-brand-asset wakir-brand-asset--${variant}`}
+  aria-label={`Wakir Labs brand asset — ${asset.label}`}
+>
+  {variant === "short" && (
+    <p class="wakir-brand-asset__short">
+      <span class="wakir-brand-asset__pill">
+        {allFinalised
+          ? `${asset.calendarCount}-of-${asset.calendarCount} calendars finalised`
+          : `${finalisedReceiptCount}/${asset.receiptCount} receipts finalised`}
+      </span>
+      <span class="wakir-brand-asset__short-text">
+        Bitcoin-anchored audit trail, block
+        {" "}
+        <a href={explorerHref(asset.blockHeightMax)} rel="external">
+          {asset.blockHeightMax}
+        </a>.
+      </span>
+    </p>
+  )}
+
+  {variant !== "short" && (
+    <>
+      <header class="wakir-brand-asset__header">
+        <p class="wakir-brand-asset__title">{asset.label}</p>
+        <span class="wakir-brand-asset__pill" aria-label="Calendar finalisation status">
+          {allFinalised
+            ? `${asset.calendarCount} of ${asset.calendarCount} calendars finalised`
+            : `${finalisedReceiptCount} of ${asset.receiptCount} receipts finalised`}
+        </span>
+      </header>
+
+      <dl class="wakir-brand-asset__facts">
+        <div class="wakir-brand-asset__fact">
+          <dt>Submitted</dt>
+          <dd>
+            <time datetime={asset.submittedAt}>{asset.submittedAt}</time>
+          </dd>
+        </div>
+        <div class="wakir-brand-asset__fact">
+          <dt>Closed</dt>
+          <dd>
+            <time datetime={asset.closedAt}>{asset.closedAt}</time>
+            {" "}
+            <span class="wakir-brand-asset__delta">
+              (~{Math.round(
+                (Date.parse(asset.closedAt) - Date.parse(asset.submittedAt)) /
+                  3_600_000,
+              )} h)
+            </span>
+          </dd>
+        </div>
+        <div class="wakir-brand-asset__fact">
+          <dt>Receipts</dt>
+          <dd>{asset.receiptCount} hour-slots</dd>
+        </div>
+        <div class="wakir-brand-asset__fact">
+          <dt>Calendars</dt>
+          <dd>
+            {asset.receipts[0].branches
+              .map((b) => b.calendar)
+              .join(", ")}
+          </dd>
+        </div>
+      </dl>
+
+      <table class="wakir-brand-asset__table">
+        <caption>Bitcoin block heights per hour-receipt</caption>
+        <thead>
+          <tr>
+            <th scope="col">Hour-slot (UTC)</th>
+            <th scope="col">Block height</th>
+            <th scope="col">Branches</th>
+          </tr>
+        </thead>
+        <tbody>
+          {asset.receipts.map((r) => {
+            const heights = Array.from(
+              new Set(r.branches.map((b) => b.blockHeight)),
+            );
+            const allBranchesEqual = heights.length === 1;
+            return (
+              <tr>
+                <td>
+                  <time datetime={`${r.hourSlot}:00:00Z`}>{r.hourSlot}</time>
+                </td>
+                <td>
+                  {allBranchesEqual ? (
+                    <a href={explorerHref(heights[0])} rel="external">
+                      {heights[0]}
+                    </a>
+                  ) : (
+                    heights
+                      .map((h) => `${h}`)
+                      .join(", ")
+                  )}
+                </td>
+                <td>
+                  {r.branches.length}/{asset.calendarCount}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <p class="wakir-brand-asset__span">
+        Block-height span: {asset.blockHeightMin}&ndash;{asset.blockHeightMax}
+        ({asset.blockHeightSpan} blocks, public-calendar batch cadence).
+      </p>
+    </>
+  )}
+
+  {variant === "long" && (
+    <>
+      <div class="wakir-brand-asset__verify">
+        <p class="wakir-brand-asset__verify-label">Verify yourself</p>
+        <code class="wakir-brand-asset__verify-cmd">{asset.verifyCommand}</code>
+      </div>
+
+      {crossReferenceHref && crossReferenceLabel && (
+        <p class="wakir-brand-asset__cross-ref">
+          <a href={crossReferenceHref}>{crossReferenceLabel} &rarr;</a>
+        </p>
+      )}
+    </>
+  )}
+</aside>
