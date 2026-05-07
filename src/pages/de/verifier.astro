@@ -1,0 +1,196 @@
+---
+/**
+ * Verifier (DE) — deutsche Spiegel-Page der EN-Page `/verifier/`. Erklärt,
+ * was ein `wakir verify`-Lauf produziert und wie das Ergebnis zu lesen ist.
+ *
+ * Schwester-Pages (DE):
+ *
+ *   - `/de/verify/`   — wie ein einzelner Wakir-Labs-Commit mit dem
+ *                        Upstream-`ots`-Client verifiziert wird
+ *   - `/de/verifier/` — wie das Ergebnis von `wakir verify` zu lesen ist,
+ *                        dem Merkle-bewussten Archiv-Verifier, der ein
+ *                        Manifest konsumiert und Per-Receipt-Verdikte
+ *                        berichtet
+ *
+ * Substanz-Quelle:
+ *   `infra/repos-skeleton/site/src/pages/verifier.astro` (EN, Sprint-
+ *   Frontend-1-Tag-2, Júlia-Stufe-1-Mikrotext-Review approved 2026-05-07).
+ *   Wording auf dieser Page ist die approved Substanz, übersetzt und an
+ *   die Brand-Voice der bestehenden DE-Pages (`de/about`, `de/verify`,
+ *   `de/roadmap`) angepasst.
+ *
+ * Provisorischer Inhalt. Das `wakir verify --output json`-Flag, das diese
+ * Form direkt produziert, ist in Arbeit (manifest-v2-Verifier-Stub).
+ * Bis dahin rendert diese Page ein build-time-eingelegtes Sample, damit
+ * Lesende die Form eines Ergebnisses sehen, bevor sie selbst eines
+ * erzeugen können.
+ *
+ * Brand-Disziplin:
+ *   - Brand-Guide §9: nur Rollen-Strings, keine Klarnamen, keine
+ *     Persona-Anzahl-Aussage. Die Page nennt Systeme (Manifest, Archiv,
+ *     Verifier, OpenTimestamps-Calendars, Bitcoin-Chain), keine Personen.
+ *   - ADR-0048-16 Honesty-Pattern: `partial`-Wording bleibt erhalten —
+ *     der Verifier mildert nicht ab. Tech-Token (`finalised`, `pending`,
+ *     `failed`, `verified`, `partial`) bleiben EN, parallel zum
+ *     `/de/verify/`-Pattern, wo `Success! Bitcoin block N attests ...`
+ *     als CLI-Output ebenfalls EN bleibt.
+ *   - Komponente `VerifierResultCard` rendert hardcoded EN-Tabellen-
+ *     Köpfe (Hour-slot / Status / Block height / Branches). Das ist
+ *     bewusst: die Komponente zeigt CLI-Output-Felder, nicht UI-Labels.
+ *   - Polkadot-Demut, Bitcoin-Disziplin: in Reihenfolge bauen, in
+ *     Reihenfolge ausliefern, in Reihenfolge verifizieren. Keine
+ *     Behauptung ohne Beleg.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
+ *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz ist
+ *     approved (siehe `inbox/2026-05-07-julia-stufe-1-mikrotext-review-
+ *     verifier-page.md`), DE-Wording ist Brand-Voice-Anpassung an die
+ *     bestehenden DE-Pages.
+ *   - CLI-Output-Schema-Sync mit `wat-eng`: diese Page ist Downstream-
+ *     Konsument; Divergenz zwischen gerenderten Feldern und realem
+ *     CLI-Output braucht eine paired edit.
+ */
+import Base from "../../layouts/Base.astro";
+import VerifierResultCard from "../../components/VerifierResultCard.astro";
+import {
+  sampleVerified,
+  samplePartial,
+} from "../../data/wakir-verifier-result-sample";
+
+const title = "Ein Wakir-Verifier-Ergebnis lesen";
+const description =
+  "Wie das Ergebnis von `wakir verify` zu lesen ist, dem Merkle-bewussten Archiv-Verifier.";
+---
+
+<Base title={title} description={description} lang="de">
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Ein Wakir-Verifier-Ergebnis lesen</h1>
+      <p class="essay__lead">
+        <code>wakir verify</code> nimmt ein Manifest und ein Archiv von
+        OpenTimestamps-Receipts, geht jeden Merkle-Pfad ab und meldet
+        Per-Receipt-Verdikte gegen die Bitcoin-Chain. Diese Seite
+        erklärt, was die Ausgabe bedeutet. Das Ergebnis-Format ist
+        dasselbe, ob du den Verifier selbst laufen ließt oder ein
+        Ergebnis liest, das jemand anderes veröffentlicht hat.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <p>
+        Für die Verifikation eines einzelnen Commits mit dem Upstream-
+        <code>ots</code>-Client siehe <a href="/de/verify/">wie ein
+        Wakir-Labs-Commit verifiziert wird</a>. Diese Seite hier handelt
+        vom Archiv-Verifier — mehrere Receipts, mehrere Calendars, ein
+        Verdikt.
+      </p>
+
+      <h2>Was der Verifier tut</h2>
+
+      <p>
+        Drei Prüfungen, in dieser Reihenfolge:
+      </p>
+
+      <ol>
+        <li>
+          Das Manifest passt zum Archiv: jeder Stunden-Receipt, der im
+          Manifest genannt ist, ist vorhanden, und jeder Receipt-
+          Inhalts-Hash stimmt überein.
+        </li>
+        <li>
+          Jeder Merkle-Pfad im Manifest reduziert sich auf den
+          OpenTimestamps-Commitment-Hash, der tatsächlich verankert
+          wurde.
+        </li>
+        <li>
+          Jeder OpenTimestamps-Receipt löst sich über mindestens einen
+          Calendar-Branch zu einer Bitcoin-Block-Höhe auf. Ein Receipt,
+          dessen Calendar-Branches alle verankert sind, ist
+          <em>finalised</em>; ein Receipt mit mindestens einem Branch,
+          der noch aggregiert, ist <em>pending</em>; ein Receipt, dessen
+          Merkle-Pfad oder Commit-Binding nicht aufgeht, ist
+          <em>failed</em>.
+        </li>
+      </ol>
+
+      <p>
+        Das Aggregat-Verdikt ist ein Fold über die Per-Receipt-Verdikte.
+        <code>verified</code> heißt: jeder Receipt ist finalised;
+        <code>partial</code> heißt: mindestens einer ist noch pending
+        und keiner ist failed; <code>failed</code> heißt: mindestens
+        einer wurde abgelehnt.
+      </p>
+
+      <h2>Ein Beispiel-Ergebnis</h2>
+
+      <p>
+        Die Karte unten ist die Ausgabe eines Verifier-Laufs gegen das
+        TV-2-Vier-Stunden-Audit-Trail-Archiv. Block-Höhen verlinken auf
+        den öffentlichen Bitcoin-Block-Explorer. Die Daten sind build-
+        time aus <code>src/data/wakir-verifier-result-sample.ts</code>
+        eingelegt. Das <code>wakir verify --output json</code>-Flag, das
+        diese Form direkt produzieren wird, ist in Arbeit.
+      </p>
+
+      <VerifierResultCard variant="full" result={sampleVerified} />
+
+      <h2>Wie ein Partial-Ergebnis aussieht</h2>
+
+      <p>
+        Wenn mindestens ein Receipt noch pending ist — Calendar
+        aggregiert, aber noch nicht in einem Block verankert — fällt das
+        Verdikt auf <code>partial</code> zurück, und der betroffene
+        Receipt wird entsprechend gezeigt. Der Verifier mildert das
+        nicht ab: ein partial-Ergebnis ist partial.
+      </p>
+
+      <VerifierResultCard variant="full" result={samplePartial} />
+
+      <h2>Die Per-Receipt-Tabelle lesen</h2>
+
+      <ul>
+        <li>
+          <strong>Hour-slot.</strong> UTC-Stunden-Slot-Identifier des
+          Receipts. Wakir-Audit-Trails werden pro UTC-Stunde aggregiert.
+        </li>
+        <li>
+          <strong>Status.</strong> Einer von <code>finalised</code>,
+          <code>pending</code>, <code>failed</code>. Status spiegelt den
+          Receipt selbst, unabhängig vom Aggregat-Verdikt.
+        </li>
+        <li>
+          <strong>Block height.</strong> Die Bitcoin-Block-Höhe, auf die
+          die Calendar-Branches dieses Receipts aufgelöst haben. Wenn
+          jeder Branch sich auf eine einzige Höhe einigt (der
+          Normalfall), verlinkt die Höhe auf den öffentlichen Block-
+          Explorer. Wenn Branches divergieren, wird jede unterschiedliche
+          Höhe einzeln gelistet.
+        </li>
+        <li>
+          <strong>Branches.</strong> Eine Zusammenfassung der Per-
+          Calendar-Branch-Verdikte in der Form <code>n/m ok</code>, mit
+          Zähl-Anhang für pending oder rejected Branches.
+        </li>
+      </ul>
+
+      <h2>Wenn das Verdikt <code>failed</code> ist</h2>
+
+      <p>
+        Ein failed-Verdikt heißt: ein Merkle-Pfad reduziert sich nicht
+        auf das verankerte Commitment, oder eine Commit-Binding-Prüfung
+        wurde abgelehnt, oder das Manifest war mit dem Archiv über einen
+        Hash uneinig. Keiner dieser Fälle ist „Calendar noch pending";
+        das wäre <code>partial</code>, nicht <code>failed</code>. Ein
+        failed-Verdikt auf einem echten Archiv ist ein Finding, das wir
+        wissen wollen — <a
+        href="https://github.com/wakir-labs/site/issues">öffne ein
+        Issue</a>.
+      </p>
+
+      <p>
+        <a href="/verifier/">Read in English</a>.
+      </p>
+    </div>
+  </article>
+</Base>
