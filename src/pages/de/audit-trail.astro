@@ -1,0 +1,215 @@
+---
+/**
+ * Audit-Trail (DE) — deutsche Spiegel-Page der EN-Page `/audit-trail/`.
+ * Zeigt die Timeline jedes Artefakts, das die Runtime verankert hat:
+ * Bitcoin-Transaktionen, Pin-Packs und Persona-Hashes, in umgekehrter
+ * chronologischer Reihenfolge.
+ *
+ * Schwester-Pages (DE):
+ *
+ *   - `/de/verify/`      — wie ein einzelner Wakir-Labs-Commit mit dem
+ *                           Upstream-`ots`-Client verifiziert wird
+ *   - `/de/verifier/`    — wie das Ergebnis eines `wakir verify`-Laufs
+ *                           zu lesen ist
+ *   - `/de/audit-trail/` — die Timeline der Artefakte, die die Runtime
+ *                           akkumuliert hat (viele Läufe, viele
+ *                           Artefakt-Arten, viele Verdikte)
+ *
+ * Substanz-Quelle:
+ *   `infra/repos-skeleton/site/src/pages/audit-trail.astro` (EN, Sprint-
+ *   Frontend-1-Tag-3, Júlia-Stufe-1-Mikrotext-Review approved 2026-05-07).
+ *   Wording auf dieser Page ist die approved Substanz, übersetzt und an
+ *   die Brand-Voice der bestehenden DE-Pages (`de/about`, `de/verify`,
+ *   `de/roadmap`, `de/verifier`) angepasst.
+ *
+ * Provisorischer Inhalt. Die Runtime emittiert noch keinen echten
+ * Audit-Trail-JSON-Export; diese Page rendert ein build-time-eingelegtes
+ * Sample, das auf reale Artefakte zeigt, die heute produziert wurden
+ * (Sprint-2-Lieferungen quer durch die Engineering-Tracks).
+ *
+ * Brand-Disziplin:
+ *   - Brand-Guide §9: nur Rollen-Strings, keine Klarnamen, keine
+ *     Persona-Anzahl-Aussage. Die Page nennt Systeme (Manifest,
+ *     OpenTimestamps-Calendars, Bitcoin-Chain, Pin-Packs, Persona-
+ *     Engine), keine Personen.
+ *   - ADR-0048-16 Honesty-Pattern: Pending- und Rejected-Branches
+ *     werden im Sample so gezeigt, wie sie sind. Kein Marketing-Sticker.
+ *   - Komponente `AuditTrailEntry` rendert hardcoded EN-Tabellen-Köpfe
+ *     (`Anchored at`, `Pin hash`, `Block height`, `Calendar`, `Verdict`,
+ *     `Tx id`, `Per-calendar branches`, `Run yourself`). Das ist
+ *     bewusst: die Komponente zeigt CLI-Output- und Daten-Felder, nicht
+ *     UI-Labels. Parallel zu `VerifierResultCard` auf `/de/verifier/`.
+ *   - Tech-Token (`ok`, `pending`, `rejected`, `finalised`, `failed`)
+ *     bleiben EN-Code-Token, parallel zum `/de/verify/`- und
+ *     `/de/verifier/`-Pattern.
+ *   - Polkadot-Demut, Bitcoin-Disziplin: in Reihenfolge bauen, in
+ *     Reihenfolge ausliefern, in Reihenfolge verifizieren. Keine
+ *     Behauptung ohne Beleg.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
+ *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz ist
+ *     approved (siehe `inbox/2026-05-07-julia-stufe-1-mikrotext-review-
+ *     audit-trail-page.md`), DE-Wording ist Brand-Voice-Anpassung an
+ *     die bestehenden DE-Pages.
+ *   - WAT-Manifest-v2-Schema-Sync: diese Page ist Downstream-Konsument;
+ *     jede Divergenz zwischen den gerenderten Feldern und dem echten
+ *     Audit-Trail-JSON-Output braucht eine gepaarte Edit auf beiden
+ *     Seiten.
+ *   - Persona-Hash-Pin-Schema-Sync: gleiche Form — Downstream-
+ *     Konsument-Erwartung, gepaarte Edit bei Divergenz.
+ */
+import Base from "../../layouts/Base.astro";
+import AuditTrailEntry from "../../components/AuditTrailEntry.astro";
+import { sampleAuditTrail } from "../../data/wakir-audit-trail-sample";
+
+const title = "Wakir-Labs-Audit-Trail";
+const description =
+  "Chronologische Sicht auf jedes Artefakt, das die Runtime verankert hat: OTS-Bitcoin-Anker, WAT-Pin-Packs, Persona-Hash-Pins.";
+---
+
+<Base title={title} description={description} lang="de">
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Wakir-Labs-Audit-Trail</h1>
+      <p class="essay__lead">
+        Jedes Artefakt, das die Runtime produziert, wird verankert. Der
+        Audit-Trail ist die Timeline dieser Anker: Bitcoin-Transaktionen,
+        Pin-Packs und Persona-Hashes, in umgekehrter chronologischer
+        Reihenfolge. Diese Page rendert ein build-time-eingelegtes
+        Sample, damit Lesende die Form sehen können, bevor die Runtime
+        einen echten Audit-Trail-Export emittiert.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <p>
+        Für das Lesen des Ergebnisses eines einzelnen Verifier-Laufs
+        siehe
+        <a href="/de/verifier/">wie ein Wakir-Verifier-Ergebnis zu lesen ist</a>.
+        Die Page, die du gerade liest, ist die Timeline-Sicht — viele
+        Läufe, viele Artefakt-Arten, viele Verdikte.
+      </p>
+
+      <h2>Was die Timeline enthält</h2>
+
+      <p>
+        Drei primitive Eintrags-Arten in dieser v0-Surface:
+      </p>
+
+      <ul>
+        <li>
+          <strong>OTS-Bitcoin-Anker.</strong> Eine Bitcoin-Transaktion,
+          die ein Merkle-Commitment per OpenTimestamps verankert hat.
+          Trägt Tx-IDs, Block-Höhe und Per-Calendar-Branch-Verdikte.
+          Ein vollständig finalisierter Anker hat jeden Calendar-Branch
+          gegen denselben Bitcoin-Block aufgelöst. Ein partieller Anker
+          hat mindestens einen Branch, der noch aggregiert. Block-Höhen
+          verlinken auf den öffentlichen Block-Explorer.
+        </li>
+        <li>
+          <strong>WAT-Pin-Pack.</strong> Ein eingefrorener Artefakt-Satz
+          mit einem SHA-256-Manifest. Pins verhindern stillen Drift über
+          Runtime-Refactors hinweg: eine Regression, die die kanonische
+          Form eines verpinnten Artefakts ändert, produziert einen
+          expliziten Pin-Bruch.
+        </li>
+        <li>
+          <strong>Persona-Hash-Pin.</strong> Ein Canonical-Subset-SHA-
+          256-Hash, der die Form einer Persona-Definition verpinnt. Das
+          Frontmatter ist kanonisch und im Hash; der Body steht außen.
+          Eine Persona-Konverter-Regression, die das Canonical-Subset
+          driftet, wirft einen Determinismus-Fehler gegen den Pin.
+        </li>
+      </ul>
+
+      <h2>Das aktuelle Sample</h2>
+
+      <p>
+        Die Einträge unten zeigen auf reale Artefakte, die am Wakir-Tag
+        2026-05-07 produziert wurden: das Inter-Agent-NATS-Subject-
+        Mapping-Spec, den Manifest-v2-Verifier-Stub, den Persona-
+        Konverter-V9-Pin und Bitcoin-Anker für die TV-2- und TV-3-Audit-
+        Trail-Läufe. Die Daten sind build-time-eingelegt aus
+        <code>src/data/wakir-audit-trail-sample.ts</code>; der Runtime-
+        Export, der diese Form direkt produzieren wird, ist in Arbeit.
+      </p>
+
+      <ol class="wakir-audit-trail-list" aria-label="Audit-Trail-Timeline">
+        {sampleAuditTrail.map((entry) => (
+          <li class="wakir-audit-trail-list__item">
+            <AuditTrailEntry entry={entry} />
+          </li>
+        ))}
+      </ol>
+
+      <h2>Einen OTS-Bitcoin-Anker-Eintrag lesen</h2>
+
+      <ul>
+        <li>
+          <strong>Pin-Hash.</strong> Bei einem OTS-Anker ist der Pin-
+          Hash der Bitcoin-Block-Hash, gegen den das OpenTimestamps-
+          Commitment aufgelöst wurde. Im Eintrags-Header verkürzt
+          dargestellt; der vollständige Hash steht im Tooltip der Zelle.
+        </li>
+        <li>
+          <strong>Block height.</strong> Wenn jeder Calendar-Branch auf
+          dieselbe Höhe einigt (der Normalfall), verlinkt die Höhe auf
+          den öffentlichen Block-Explorer. Wenn Branches divergieren
+          oder noch pending sind, erzählt die Per-Branch-Tabelle die
+          ganze Geschichte.
+        </li>
+        <li>
+          <strong>Per-Calendar-Branches.</strong> Dieselben vier
+          öffentlichen OpenTimestamps-Calendars, die auch sonst in der
+          Runtime verwendet werden:
+          <code>alice</code>, <code>bob</code>, <code>finney</code>,
+          <code>catallaxy</code>. Verdikt ist <code>ok</code> für einen
+          finalisierten Branch, <code>pending</code> für einen
+          aggregierten-aber-noch-nicht-verankerten Branch,
+          <code>rejected</code> für einen Branch, dessen Merkle-Pfad
+          oder Commit-Bindung nicht durchging.
+        </li>
+      </ul>
+
+      <h2>Einen Pin-Pack-Eintrag lesen</h2>
+
+      <p>
+        Ein Pin-Pack listet die Dateien auf, die einen eingefrorenen
+        Artefakt-Satz ausmachen, plus den Canonical-Shape-Pin, den die
+        Runtime gegen sie erwartet. Der Eintrag zeigt die Artefakt-
+        Dateinamen und Zeilen-Zahlen als strukturelle Skizze — der
+        substanzielle Inhalt ist der Pin-Hash selbst, plus der Test-
+        Name, der fehlschlägt, wenn der Pin bricht.
+      </p>
+
+      <h2>Einen Persona-Hash-Pin-Eintrag lesen</h2>
+
+      <p>
+        Ein Persona-Hash-Pin-Eintrag zeigt das Canonical-Subset-SHA-256
+        und die benannten Pin-Konstanten, die die Runtime exportiert.
+        Eine Konverter-Regression, die das Canonical-Subset driftet,
+        wirft einen Determinismus-Fehler, der den Pin namentlich nennt;
+        der Eintrag zeigt den Test, der diesen Drift fängt. Der
+        Verify-Befehl reproduziert den Canonical-Subset-Hash aus einer
+        Persona-Definition, ohne die Runtime auszuführen.
+      </p>
+
+      <h2>Was hier noch nicht ist</h2>
+
+      <p>
+        Das ist eine v0-Timeline-Sicht. Sie unterstützt noch kein
+        Filtern nach Eintrags-Art, keine Suche nach Hash und keine
+        Paginierung über das build-time-eingelegte Sample hinaus. Der
+        Runtime-Export, der einen echten Audit-Trail-JSON speist, ist
+        in Arbeit; sobald er landet, switcht diese Page von einem
+        Sechs-Eintrags-Sample auf die volle Timeline. Bis dahin ist das
+        Sample real, aber partiell.
+      </p>
+
+      <p>
+        <a href="/audit-trail/">Read in English</a>.
+      </p>
+    </div>
+  </article>
+</Base>
