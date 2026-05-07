@@ -64,8 +64,9 @@ const explorerHref = (height: number): string =>
   `${explorerBlockBaseUrl}${height}`;
 ---
 
-<aside
+<div
   class={`wakir-brand-asset wakir-brand-asset--${variant}`}
+  role="group"
   aria-label={`Wakir Labs brand asset — ${asset.label}`}
 >
   {variant === "short" && (
@@ -191,4 +192,4 @@ const explorerHref = (height: number): string =>
       )}
     </>
   )}
-</aside>
+</div>
