@@ -47,3 +47,12 @@ public/fonts/LICENSE-source-serif-4.txt:bip39-mnemonic-bare:22
 # that the company would like to ride a wave..." in the W1 essay.
 # Verified false positive.
 src/pages/why-we-are-wakir-labs.astro:bip39-mnemonic-bare:97
+
+# 2026-05-07 — Frontend: false positive on the audit-trail sample
+# data file. The 64-hex string `0f298894204e6117e42ad7073b7a3af8
+# ada1851de74d585fc5cb4c4d70e1d793` is the persona-converter V9
+# canonical-subset SHA-256 hash pin (PERSONA_HASH_PIN_V9), already
+# published in the Sprint-2 Persona-Engine Tag-1 outbox. Same shape
+# as an EVM private key (64 hex), zero overlap with one in fact.
+# Verified false positive.
+src/data/wakir-audit-trail-sample.ts:hex-private-key-bare:174
