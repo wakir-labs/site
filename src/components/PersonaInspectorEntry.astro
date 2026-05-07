@@ -57,6 +57,7 @@ const statusLabel = (status: PersonaInspectorEntry["status"]): string =>
     <span
       class="wakir-persona-inspector-entry__pill"
       data-status={entry.status}
+      role="status"
       aria-label="Activation status"
     >
       {statusLabel(entry.status)}
