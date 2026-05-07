@@ -113,6 +113,7 @@ const heights = entry.branches ? branchHeights(entry.branches) : [];
     <span
       class="wakir-audit-trail-entry__pill"
       data-kind={entry.kind}
+      role="status"
       aria-label="Entry kind"
     >
       {kindLabel(entry.kind)}
