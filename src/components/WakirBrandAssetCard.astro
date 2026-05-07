@@ -89,7 +89,7 @@ const explorerHref = (height: number): string =>
     <>
       <header class="wakir-brand-asset__header">
         <p class="wakir-brand-asset__title">{asset.label}</p>
-        <span class="wakir-brand-asset__pill" aria-label="Calendar finalisation status">
+        <span class="wakir-brand-asset__pill" role="status" aria-label="Calendar finalisation status">
           {allFinalised
             ? `${asset.calendarCount} of ${asset.calendarCount} calendars finalised`
             : `${finalisedReceiptCount} of ${asset.receiptCount} receipts finalised`}
