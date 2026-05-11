@@ -12,8 +12,8 @@
  *   - `/de/about/`   — wer Wakir Labs ist und wie wir publizieren
  *
  * Die DE-Mirror für `/verifier/` und `/audit-trail/` sind Folge-Items
- * desselben Sprint-Auftrags (O6); Cross-Refs auf die EN-Pages bleiben
- * solange aktiv.
+ * desselben Sprint-Auftrags (O6); Cross-Refs zeigen jetzt auf die
+ * DE-Mirrors (Sprint-Frontend-3-Tag-1-Patch nach Júlia-Stufe-1-Review).
  *
  * Substanz-Quelle:
  *   `infra/repos-skeleton/site/src/pages/roadmap.astro` (EN, Tag-5).
@@ -42,10 +42,10 @@
  *     Behauptung ohne Beleg.
  *
  * Cross-Review-Hooks:
- *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
- *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz
- *     ist approved, DE-Wording ist Brand-Voice-Anpassung an die
- *     bestehenden DE-Pages.
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review durchgeführt
+ *     2026-05-11 (11/11 Pro-Stellen Ack, Marketing-Slop-Audit 0/3,
+ *     Push-Empfehlungs-Punkt DE→DE-Cross-Refs in Sprint-Frontend-3-
+ *     Tag-1-Patch umgesetzt).
  *   - Aufsichtsrats-Pre-Go-Live-Sichtung pending. Site-Push bleibt
  *     dev-engineering-Hand; diese Page wird auf einem Feature-
  *     Branch ausgeliefert.
@@ -93,15 +93,15 @@ const description =
 
       <WakirBrandAssetCard
         variant="medium"
-        crossReferenceHref="/audit-trail/"
+        crossReferenceHref="/de/audit-trail/"
         crossReferenceLabel="Vollständige Audit-Trail-Timeline ansehen"
       />
 
       <p>
         Daraus folgen zwei Lese-Oberflächen:
-        <a href="/verifier/">wie sich die Ausgabe eines einzelnen
+        <a href="/de/verifier/">wie sich die Ausgabe eines einzelnen
         Verifier-Laufs liest</a> für das Pro-Quittungs-Urteil sowie
-        <a href="/audit-trail/">die Audit-Trail-Timeline</a> für die
+        <a href="/de/audit-trail/">die Audit-Trail-Timeline</a> für die
         chronologische Liste der Artefakte, die die Runtime verankert
         hat. Die DE-Versionen dieser beiden Seiten folgen im selben
         Sprint.
@@ -222,7 +222,7 @@ const description =
         einem Glaubwürdigkeits-Problem, das wir nicht brauchen. Wenn
         ein Build-Item landet, wird diese Seite aktualisiert, und das
         Artefakt erscheint auf
-        <a href="/audit-trail/">der Audit-Trail-Timeline</a>. Die
+        <a href="/de/audit-trail/">der Audit-Trail-Timeline</a>. Die
         Timeline ist die Quittung; diese Seite ist der Plan.
       </p>
 
