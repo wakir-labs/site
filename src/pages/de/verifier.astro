@@ -42,11 +42,10 @@
  *     Behauptung ohne Beleg.
  *
  * Cross-Review-Hooks:
- *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
- *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz ist
- *     approved (siehe `inbox/2026-05-07-julia-stufe-1-mikrotext-review-
- *     verifier-page.md`), DE-Wording ist Brand-Voice-Anpassung an die
- *     bestehenden DE-Pages.
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review durchgeführt
+ *     2026-05-11 (9/9 Pro-Stellen Ack, zwei Modify-Vorschläge in
+ *     Sprint-Frontend-3-Tag-1-Patch umgesetzt: Tempus-Glättung
+ *     „ließt"→„lässt" und typografisches DE-Schließend-Quote).
  *   - CLI-Output-Schema-Sync mit `wat-eng`: diese Page ist Downstream-
  *     Konsument; Divergenz zwischen gerenderten Feldern und realem
  *     CLI-Output braucht eine paired edit.
@@ -72,7 +71,7 @@ const description =
         OpenTimestamps-Receipts, geht jeden Merkle-Pfad ab und meldet
         Per-Receipt-Verdikte gegen die Bitcoin-Chain. Diese Seite
         erklärt, was die Ausgabe bedeutet. Das Ergebnis-Format ist
-        dasselbe, ob du den Verifier selbst laufen ließt oder ein
+        dasselbe, ob du den Verifier selbst laufen lässt oder ein
         Ergebnis liest, das jemand anderes veröffentlicht hat.
       </p>
     </header>
@@ -180,7 +179,7 @@ const description =
         Ein failed-Verdikt heißt: ein Merkle-Pfad reduziert sich nicht
         auf das verankerte Commitment, oder eine Commit-Binding-Prüfung
         wurde abgelehnt, oder das Manifest war mit dem Archiv über einen
-        Hash uneinig. Keiner dieser Fälle ist „Calendar noch pending";
+        Hash uneinig. Keiner dieser Fälle ist „Calendar noch pending“;
         das wäre <code>partial</code>, nicht <code>failed</code>. Ein
         failed-Verdikt auf einem echten Archiv ist ein Finding, das wir
         wissen wollen — <a
