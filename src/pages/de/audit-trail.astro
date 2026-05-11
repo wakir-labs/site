@@ -166,8 +166,9 @@ const description =
         <p class="wakir-audit-trail-filter__note">
           Das Signatur-Gate (Sprint-6 Tag-2) prüft Manifest-Ed25519-
           Signaturen gegen einen opt-in Public-Key-Pfad. Der Filter
-          surfaced ausschließlich den Signatur-Ausgang; die Per-Calendar-
-          Branch-Verdikte auf jedem OTS-Anker-Eintrag bleiben unabhängig.
+          blendet ausschließlich den Signatur-Ausgang ein; die Per-
+          Calendar-Branch-Verdikte auf jedem OTS-Anker-Eintrag bleiben
+          unabhängig.
         </p>
       </details>
 
@@ -272,9 +273,10 @@ const description =
         <code>verified (4 hours)</code>. Jede Divergenz — auch eine
         einzige nicht-verifizierte Stunde in einer ansonsten verifizierten
         Kohorte — schaltet das Pill auf eine Body-Emphasis-Darstellung
-        und surfaced eine Per-Stunden-Aufschlüsselungstabelle, damit der
-        Leser einen einzelnen Failure nicht aus den Augen verliert,
-        nur weil ein Aggregat darüber steht. Das Filter-<code>&lt;details&gt;</code>
+        und blendet eine Per-Stunden-Aufschlüsselungstabelle ein, damit
+        der Leser einen einzelnen Failure nicht aus den Augen verliert,
+        nur weil ein Aggregat darüber steht. Das Filter-
+        <code>&lt;details&gt;</code>
         oben verengt die Timeline auf Einträge nach Signatur-Ausgang;
         mit deaktiviertem JavaScript funktioniert die Page weiter und
         zeigt alles.
@@ -300,8 +302,8 @@ const description =
         kein Filtern nach Eintrags-Art, keine Suche nach Hash und keine
         Paginierung über das build-time-eingelegte Sample hinaus. Der
         Runtime-Export, der einen echten Audit-Trail-JSON speist, ist
-        in Arbeit; sobald er landet, switcht diese Page von einem
-        Sechs-Eintrags-Sample auf die volle Timeline. Bis dahin ist das
+        in Arbeit; sobald er landet, wechselt diese Page von einem
+        Sechs-Eintrags-Sample zur vollen Timeline. Bis dahin ist das
         Sample real, aber partiell.
       </p>
 
