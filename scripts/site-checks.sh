@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 # site-checks.sh — bundled quality checks for the Wakir Labs site.
 #
-# Four checks, in order of cost:
-#   1. link-check:  every internal <a href> resolves to a built page or asset.
-#   2. links-live:  every internal <a href> on the live site (CF Pages) is a
-#                   real page, not the CF-Pages 404-fallback (200 + index HTML).
-#   3. a11y:        no WCAG 2.1 AA errors on any built page.
-#   4. lighthouse:  performance / SEO / a11y >= 95 on key pages.
+# Five checks, in order of cost:
+#   1.  link-check:  every internal <a href> resolves to a built page or asset.
+#   1b. de-refs:     every EN-cross-ref on a DE mirror points at the DE
+#                    counterpart (when one exists), unless it is a deliberate
+#                    "Read in English" / "englische Lesehilfe" language-switch.
+#   2.  links-live:  every internal <a href> on the live site (CF Pages) is a
+#                    real page, not the CF-Pages 404-fallback (200 + index HTML).
+#   3.  a11y:        no WCAG 2.1 AA errors on any built page.
+#   4.  lighthouse:  performance / SEO / a11y >= 95 on key pages.
 #
 # Tool choices and rationale are documented in the outbox report.
 #
 # Usage:
-#   pnpm site:check                 # links + a11y + lighthouse (local-only)
+#   pnpm site:check                 # links + de-refs + a11y + lighthouse (local-only)
 #   pnpm site:check links           # local link-check (dist/) only
 #   pnpm site:check links-live      # live audit against $LIVE_BASE_URL
+#   pnpm site:check de-refs         # EN-DE cross-ref drift check (source-level)
 #   pnpm site:check a11y            # a11y only
 #   pnpm site:check lighthouse      # lighthouse only
 #
@@ -237,6 +241,19 @@ check_links_live() {
   log "links-live: ok"
 }
 
+# ----- 1b. de-refs ----------------------------------------------------------
+# Lint-check for EN-DE pairing consistency across DE-mirror pages.
+# Rationale (Lena, Sprint-Frontend-4 Tag-1): with now six DE mirrors,
+# manual cross-ref auditing doesn't scale. The check is source-level,
+# fast (~100ms), and dependency-free — no dist/ build required. Run it
+# pre-push so EN cross-refs on DE pages don't accumulate silently.
+check_de_refs() {
+  log "de-refs: scanning src/pages/de/*.astro"
+  node "$ROOT/scripts/check-de-cross-refs.mjs" --quiet \
+    || fail "de-refs: EN-cross-ref drift on at least one DE mirror"
+  log "de-refs: ok"
+}
+
 # ----- 2. a11y --------------------------------------------------------------
 # pa11y-ci against built pages served via http-server.
 # Rationale (Tomás): pa11y is the de-facto npm-distributed a11y CLI, runs
@@ -321,14 +338,16 @@ check_lighthouse() {
 case "$mode" in
   links)      check_links ;;
   links-live) check_links_live ;;
+  de-refs)    check_de_refs ;;
   a11y)       check_a11y ;;
   lighthouse) check_lighthouse ;;
   all)
     check_links
+    check_de_refs
     check_a11y
     check_lighthouse
     ;;
-  *) fail "unknown mode: $mode (use links|links-live|a11y|lighthouse|all)" ;;
+  *) fail "unknown mode: $mode (use links|links-live|de-refs|a11y|lighthouse|all)" ;;
 esac
 
 log "all requested checks passed"

@@ -15,7 +15,9 @@
     "site:check": "bash scripts/site-checks.sh all",
     "site:check:links": "bash scripts/site-checks.sh links",
     "site:check:a11y": "bash scripts/site-checks.sh a11y",
-    "site:check:lighthouse": "bash scripts/site-checks.sh lighthouse"
+    "site:check:lighthouse": "bash scripts/site-checks.sh lighthouse",
+    "site:check:de-refs": "node scripts/check-de-cross-refs.mjs",
+    "site:check:de-refs:test": "node scripts/test-check-de-cross-refs.mjs"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
