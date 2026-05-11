@@ -135,13 +135,78 @@ const description =
         Export, der diese Form direkt produzieren wird, ist in Arbeit.
       </p>
 
-      <ol class="wakir-audit-trail-list" aria-label="Audit-Trail-Timeline">
+      <details class="wakir-audit-trail-filter">
+        <summary>Filtern nach Signatur-Gate</summary>
+        <div
+          class="wakir-audit-trail-filter__controls"
+          role="radiogroup"
+          aria-label="Signatur-Gate-Filter"
+        >
+          <label>
+            <input type="radio" name="signature-filter" value="all" checked />
+            Alle Einträge
+          </label>
+          <label>
+            <input type="radio" name="signature-filter" value="verified" />
+            Nur verifiziert
+          </label>
+          <label>
+            <input type="radio" name="signature-filter" value="unverified" />
+            Unverifiziert / abgelehnt
+          </label>
+          <label>
+            <input type="radio" name="signature-filter" value="mixed" />
+            Gemischt
+          </label>
+          <label>
+            <input type="radio" name="signature-filter" value="none" />
+            Keine Signatur-Zeile
+          </label>
+        </div>
+        <p class="wakir-audit-trail-filter__note">
+          Das Signatur-Gate (Sprint-6 Tag-2) prüft Manifest-Ed25519-
+          Signaturen gegen einen opt-in Public-Key-Pfad. Der Filter
+          surfaced ausschließlich den Signatur-Ausgang; die Per-Calendar-
+          Branch-Verdikte auf jedem OTS-Anker-Eintrag bleiben unabhängig.
+        </p>
+      </details>
+
+      <ol
+        class="wakir-audit-trail-list"
+        aria-label="Audit-Trail-Timeline"
+        data-signature-filter="all"
+      >
         {sampleAuditTrail.map((entry) => (
           <li class="wakir-audit-trail-list__item">
             <AuditTrailEntry entry={entry} />
           </li>
         ))}
       </ol>
+
+      <script is:inline>
+        // Progressive-Enhancement-Filter. Mit JS aktiv flipt ein
+        // Radio-Change das `data-signature-filter`-Attribut auf dem
+        // List-Root; die CSS-`:has(...)`-Selektoren übernehmen das
+        // Hide/Show. Ohne JS bleibt die Liste auf `all` — alle
+        // Einträge sichtbar, Page voll lesbar.
+        (function () {
+          var list = document.querySelector(
+            ".wakir-audit-trail-list[data-signature-filter]",
+          );
+          if (!list) return;
+          var radios = document.querySelectorAll(
+            'input[type="radio"][name="signature-filter"]',
+          );
+          for (var i = 0; i < radios.length; i++) {
+            radios[i].addEventListener("change", function (event) {
+              list.setAttribute(
+                "data-signature-filter",
+                event.target.value,
+              );
+            });
+          }
+        })();
+      </script>
 
       <h2>Einen OTS-Bitcoin-Anker-Eintrag lesen</h2>
 
@@ -183,6 +248,38 @@ const description =
         Name, der fehlschlägt, wenn der Pin bricht.
       </p>
 
+      <h2>Eine Signatur-Gate-Zeile lesen</h2>
+
+      <p>
+        Einträge, die über den Sprint-6-Tag-2-Driver-Mode geliefert
+        werden, tragen ein Manifest-Signatur-Gate-Ergebnis. Der
+        Runtime-Verifier
+        (<code>wat.verify.manifest_v2.verify_real_manifest_file</code>)
+        emittiert pro Stunden-Receipt einen von sechs gepinnten Werten:
+        <code>verified</code>, wenn die Ed25519-Signatur gegen den
+        gelieferten Public-Key durchgeht; <code>unsigned-permissive</code>,
+        wenn das Manifest keinen Signatur-Slot hat und der Verifier im
+        permissiven Modus aufgerufen wurde; <code>unsigned-strict</code>,
+        wenn der Verifier im strikten Modus gegen ein unsigniertes
+        Manifest aufgerufen wurde; <code>mismatch</code>, wenn eine
+        wohlgeformte Signatur nicht verifizierte;
+        <code>structural-error</code>, wenn der Slot selbst malformed war.
+      </p>
+
+      <p>
+        Eine Kohorte mit jedem Wert auf <code>verified</code> rendert
+        das Brand-Akzent-Pill und ein Summary wie
+        <code>verified (4 hours)</code>. Jede Divergenz — auch eine
+        einzige nicht-verifizierte Stunde in einer ansonsten verifizierten
+        Kohorte — schaltet das Pill auf eine Body-Emphasis-Darstellung
+        und surfaced eine Per-Stunden-Aufschlüsselungstabelle, damit der
+        Leser einen einzelnen Failure nicht aus den Augen verliert,
+        nur weil ein Aggregat darüber steht. Das Filter-<code>&lt;details&gt;</code>
+        oben verengt die Timeline auf Einträge nach Signatur-Ausgang;
+        mit deaktiviertem JavaScript funktioniert die Page weiter und
+        zeigt alles.
+      </p>
+
       <h2>Einen Persona-Hash-Pin-Eintrag lesen</h2>
 
       <p>
@@ -198,8 +295,9 @@ const description =
       <h2>Was hier noch nicht ist</h2>
 
       <p>
-        Das ist eine v0-Timeline-Sicht. Sie unterstützt noch kein
-        Filtern nach Eintrags-Art, keine Suche nach Hash und keine
+        Das ist eine v0-Timeline-Sicht. Sie unterstützt aktuell einen
+        Filter nach Signatur-Gate-Ausgang (Sprint-6 Tag-2), aber noch
+        kein Filtern nach Eintrags-Art, keine Suche nach Hash und keine
         Paginierung über das build-time-eingelegte Sample hinaus. Der
         Runtime-Export, der einen echten Audit-Trail-JSON speist, ist
         in Arbeit; sobald er landet, switcht diese Page von einem

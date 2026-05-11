@@ -1267,3 +1267,174 @@ dd {
 .wakir-audit-trail-entry__external a {
   color: var(--color-accent);
 }
+
+/* -------------------------------------------------------------------------
+ * Signature-status wire-up (Sprint-6 Tag-2)
+ *
+ * Renders the manifest-signature gate outcome reported by the runtime
+ * verifier (`wat.verify.manifest_v2.{verify_manifest_v2_file,
+ * verify_real_manifest_file}`) and surfaced through the CLI driver
+ * `scripts/external_verifier_validation.py --real-tvN --verify-signature`.
+ *
+ * Visual mapping uses the existing accent / muted / body trio per
+ * Brand-Guide §8 (sand-gold accent, warm off-white body, muted neutral).
+ * No new colour tokens introduced — verdict shift is communicated by
+ * the established palette, parity with the verifier-result `verified`
+ * / `partial` / `failed` pill and the audit-trail kind pill.
+ *
+ * Tone discriminator is `data-signature-tone` on the relevant element:
+ *
+ *   - `accent` : every signature verdict in the cohort is `verified`.
+ *   - `muted`  : permissive-unsigned or mixed-non-failure cohort.
+ *   - `body`   : at least one rejection (mismatch / unsigned-strict /
+ *                structural-error).
+ *
+ * Pinned in CSS via attribute selectors so a future addition of a
+ * pinned status (e.g. a v0.3.0 schema) only requires adding the new
+ * literal to the TypeScript union and the JS classifier; no CSS rule
+ * names need to change.
+ * ------------------------------------------------------------------------- */
+
+/* Pill container — the kind pill and the signature pill stack
+ * vertically on narrow screens, flow inline on wide screens. The
+ * header already wraps so this container does not need its own flex
+ * fallback. */
+.wakir-audit-trail-entry__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+/* Signature pill: shares chrome with the kind pill (same dimensions,
+ * same family, same radius), distinguished by `data-signature-tone`.
+ * The base rule keeps the accent (parity with `verified` brand-demo);
+ * `muted` and `body` tones override below. */
+.wakir-audit-trail-entry__pill--signature {
+  /* Inherit base pill chrome. The tone-attribute overrides drive the
+   * colour shift. We do NOT override the kind-pill rules above —
+   * the dual `[data-kind][data-signature-tone]` selector cascade
+   * would surprise future editors. Instead the signature pill is a
+   * separate element with its own tone semantics. */
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.wakir-audit-trail-entry__pill--signature[data-signature-tone="muted"] {
+  border-color: var(--color-muted);
+  color: var(--color-muted);
+}
+
+.wakir-audit-trail-entry__pill--signature[data-signature-tone="body"] {
+  border-color: var(--color-body);
+  color: var(--color-body);
+  background: var(--color-bg);
+}
+
+/* Signature fact (inside the dl summary). Same typography as other
+ * facts; tone modulates the body colour but not the dt/dd structure. */
+.wakir-audit-trail-entry__signature-fact[data-signature-tone="accent"] {
+  color: var(--color-accent);
+}
+
+.wakir-audit-trail-entry__signature-fact[data-signature-tone="muted"] {
+  color: var(--color-muted);
+}
+
+.wakir-audit-trail-entry__signature-fact[data-signature-tone="body"] {
+  color: var(--color-body);
+  font-weight: 600;
+}
+
+/* Per-hour signature breakdown table. Reuses the per-calendar branches
+ * table chrome; tone modulates the row body colour. */
+.wakir-audit-trail-entry__sig-table tr[data-signature-tone="accent"] td {
+  color: var(--color-accent);
+}
+
+.wakir-audit-trail-entry__sig-table tr[data-signature-tone="muted"] td {
+  color: var(--color-muted);
+}
+
+.wakir-audit-trail-entry__sig-table tr[data-signature-tone="body"] td {
+  color: var(--color-body);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+ * Audit-trail signature filter (Sprint-6 Tag-2)
+ *
+ * Page-level filter `<details>` (rendered by `audit-trail.astro`)
+ * sets a `data-signature-filter` attribute on the list root. The CSS
+ * rules below hide entries whose own `data-signature-summary` does
+ * not match the active filter. Progressive enhancement: when JS is
+ * disabled the `<details>` still toggles via native HTML, but the
+ * filter remains at "all" so every entry stays visible — the page
+ * is fully readable without JavaScript.
+ *
+ * Filter values:
+ *   - `all`        : default, no entries hidden.
+ *   - `verified`   : only entries where every signature value is
+ *                    `verified`.
+ *   - `unverified` : only entries with at least one rejection.
+ *   - `mixed`      : only entries with divergent non-failure values.
+ *   - `none`       : only entries that carry no signature row.
+ * ------------------------------------------------------------------------- */
+
+.wakir-audit-trail-list[data-signature-filter="verified"]
+  .wakir-audit-trail-list__item:not(:has(.wakir-audit-trail-entry[data-signature-summary="verified"])),
+.wakir-audit-trail-list[data-signature-filter="unverified"]
+  .wakir-audit-trail-list__item:not(:has(.wakir-audit-trail-entry[data-signature-summary="unverified"])),
+.wakir-audit-trail-list[data-signature-filter="mixed"]
+  .wakir-audit-trail-list__item:not(:has(.wakir-audit-trail-entry[data-signature-summary="mixed"])),
+.wakir-audit-trail-list[data-signature-filter="none"]
+  .wakir-audit-trail-list__item:not(:has(.wakir-audit-trail-entry[data-signature-summary="none"])) {
+  display: none;
+}
+
+.wakir-audit-trail-filter {
+  margin-block-end: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-block);
+  padding: var(--space-3);
+  background: var(--color-bg-elevated);
+}
+
+.wakir-audit-trail-filter > summary {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wakir-audit-trail-filter > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wakir-audit-trail-filter__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-body);
+}
+
+.wakir-audit-trail-filter__controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.wakir-audit-trail-filter__note {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin-block-start: var(--space-2);
+}
