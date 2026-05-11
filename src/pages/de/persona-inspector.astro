@@ -1,0 +1,219 @@
+---
+/**
+ * Persona-Inspector (DE) — deutsche Spiegel-Page der EN-Page
+ * `/persona-inspector/`. Ein internes Read-Only-Verzeichnis der
+ * Rollen-String-Slugs, funktionalen Rollen, Aktivierungs-Status,
+ * Persona-Hash-Pin-Konstanten und konstituierenden ADRs.
+ *
+ * NICHT MARKETING-SURFACE. Die Page ist bewusst intern-only:
+ *
+ *   - `<Base noindex>` emittiert `<meta name="robots" content="noindex,
+ *     nofollow">` und unterdrückt Canonical / OpenGraph / Twitter /
+ *     hreflang / JSON-LD, damit Suchmaschinen und Social-Previews
+ *     diese URL nicht indexieren.
+ *   - Die Page rendert ausschließlich Rollen-String-Slugs — niemals
+ *     Klarnamen. Brand-Guide §9 (Blocklist-Pfad) gilt für jede
+ *     öffentliche Astro-Surface, auch für nominell "interne" Pages.
+ *   - Die Page rendert KEINE Persona-Anzahl-Aussage ("wir sind N
+ *     Personas"). Das Verzeichnis zeigt einzelne Cards; jedes Anzahl-
+ *     Signal ist opak (ADR-IDs, keine Summen).
+ *
+ * Schwester-Pages (DE):
+ *
+ *   - `/de/verify/`           — wie ein einzelner Wakir-Labs-Commit
+ *                                 mit dem Upstream-`ots`-Client
+ *                                 verifiziert wird
+ *   - `/de/verifier/`         — wie das Ergebnis eines `wakir
+ *                                 verify`-Laufs zu lesen ist
+ *   - `/de/audit-trail/`      — die Timeline aller verankerten
+ *                                 Artefakte
+ *   - `/de/roadmap/`          — Plan-Page; was als Nächstes kommt
+ *
+ * Substanz-Quelle:
+ *   `infra/repos-skeleton/site/src/pages/persona-inspector.astro` (EN,
+ *   Sprint-Frontend-1-Tag-4). Wording auf dieser Page ist die
+ *   approved Substanz, übersetzt und an die Brand-Voice der
+ *   bestehenden DE-Pages (`/de/about/`, `/de/verify/`, `/de/roadmap/`,
+ *   `/de/verifier/`, `/de/audit-trail/`) angepasst.
+ *
+ * Provisorischer Inhalt. Die Persona-Engine emittiert noch kein
+ * JSON-Verzeichnis, das diese Page direkt konsumieren kann; die Daten
+ * liegen in `src/data/wakir-persona-inspector-sample.ts` als
+ * build-time-eingelegte Fixture. Wenn die Persona-Engine-Surface
+ * einen echten Verzeichnis-Export landet, switcht diese Page um.
+ *
+ * Audience (per F3 = intern-only Phase-0-Decision, Mira-Antwort
+ * 2026-05-07):
+ *   - Wakir-Team-Reviewer, die Persona-Konfiguration, Persona-Hash-
+ *     Pin-Alignment mit dem Persona-Engine-Pin-Pack und ADR-Cross-
+ *     References prüfen.
+ *   - Internal-Audit (`internal-audit`-Rolle), die Aktivierungs-ADRs
+ *     gegen die Wave-3-Cohort cross-referenziert.
+ *   - HR (`hr`-Rolle), die die Aktivierungs-Status-Surface gegen die
+ *     Persona-Dateien verifiziert.
+ *
+ * NICHT für: externe Reviewer, Marketing-Audience, Third-Party-
+ * Compliance-Auditoren. Diese Audiences lesen `/de/verifier/`,
+ * `/de/audit-trail/` und die Position-Papers.
+ *
+ * Brand-Disziplin:
+ *   - Brand-Guide §9: nur Rollen-Strings, keine Klarnamen, keine
+ *     Persona-Anzahl-Aussage. Die Page listet einzelne Cards in
+ *     ADR-Arrival-Order, niemals als gezählte Summe.
+ *   - Komponente `PersonaInspectorEntry` rendert hardcoded EN-Labels
+ *     für Pill-Status (`active` / `in activation`), für die `<dl>`-
+ *     Term-Strings (`Hash-pin constant`, `Constituting ADR`) und für
+ *     die `aria-label`-Strings (`Persona directory entry: …`,
+ *     `Activation status`). Das ist bewusst: die Komponente zeigt
+ *     CLI-Output- und Daten-Felder, nicht UI-Labels. Parallel zu
+ *     `VerifierResultCard` auf `/de/verifier/` und `AuditTrailEntry`
+ *     auf `/de/audit-trail/`.
+ *   - Tech-Token (`active`, `in-activation`, `internal-audit`, `hr`,
+ *     `subagent_type=…`) bleiben EN-Code-Token, parallel zum
+ *     `/de/verify/`- und `/de/verifier/`-Pattern.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G (Júlia): Stufe-1-Mikrotext-Review für DE-Mirror
+ *     pending; Memo folgt im normalen Sprint-Workflow. EN-Substanz
+ *     ist als intern-only-Page nicht durch Júlia-Stufe-1-Review
+ *     gegangen (anders als die Marketing-DE-Mirrors); ein
+ *     Heads-up-Brand-Sweep auf §9-Disziplin bleibt gute Praxis.
+ *   - Persona-Engine-Schema-Sync (`persona-engine-eng`-Rolle): die
+ *     Hash-Pin-Konstanten-Namen, die jede Card zeigt, sind Downstream-
+ *     Konsument-Erwartung; benennt die Persona-Engine die Konstante
+ *     um, braucht diese Surface eine gepaarte Edit.
+ *   - Keine hreflang-Cross-Reference, kein `dePagesAvailable`-Eintrag:
+ *     beide Pages (EN und DE) sind noindex; eine hreflang-Beziehung
+ *     wäre semantisch falsch und würde Crawlern Signale geben, die
+ *     bewusst unterdrückt sind. Die `Base.astro`-Logik bricht das
+ *     bereits konsistent ab — `dePagesAvailable` enthält
+ *     `/persona-inspector/` DESHALB NICHT.
+ */
+import Base from "../../layouts/Base.astro";
+import PersonaInspectorEntry from "../../components/PersonaInspectorEntry.astro";
+import { samplePersonaInspector } from "../../data/wakir-persona-inspector-sample";
+
+const title = "Persona-Inspector (intern)";
+const description =
+  "Interne Read-Only-Sicht auf das Rollen-String-Verzeichnis: Slug, funktionale Rolle, Aktivierungs-Status, Persona-Hash-Pin-Konstante, konstituierende ADR.";
+---
+
+<Base title={title} description={description} lang="de" noindex>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Persona-Inspector</h1>
+      <p class="essay__lead">
+        Eine interne Read-Only-Sicht auf das Rollen-String-Verzeichnis.
+        Jede Card listet den Inter-Agent-Slug, die funktionale Rolle,
+        den Aktivierungs-Status, die Persona-Hash-Pin-Konstante, gegen
+        die die Persona-Engine pinnt, und die konstituierende ADR.
+      </p>
+      <p class="wakir-persona-inspector__internal-banner" role="note">
+        <strong>Intern-only Surface.</strong> Diese Page ist nicht Teil
+        der Marketing-Surface; der Response setzt
+        <code>noindex,nofollow</code>. Externe Reviewer lesen statt
+        dessen <a href="/de/verifier/">die Verifier-Page</a> oder
+        <a href="/de/audit-trail/">den Audit-Trail</a>.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>Wie eine Card zu lesen ist</h2>
+
+      <ul>
+        <li>
+          <strong>Slug.</strong> Der Einzel-Wort-Inter-Agent-
+          Identifier. Derselbe Slug, der in <code>subagent_type=…</code>,
+          in NATS-Subject-Namen und in Cross-Review-References
+          verwendet wird.
+        </li>
+        <li>
+          <strong>Rolle.</strong> Der funktionale Rollen-Descriptor in
+          der Form, die org-weit verwendet wird
+          (<code>dev-engineering</code>, <code>wirelang-eng</code>,
+          <code>frontend-eng</code>). Schlichter funktionaler
+          Descriptor; kein Klarname.
+        </li>
+        <li>
+          <strong>Domain.</strong> Ein Satz, der beschreibt, was die
+          Rolle besitzt. Aus den Persona-Dateien abgelesen; bewusst
+          kurz, damit ein Reviewer das Verzeichnis im Blick scannen
+          kann.
+        </li>
+        <li>
+          <strong>Aktivierungs-Status.</strong> <code>active</code>,
+          wenn die Rolle heute Arbeit liefert;
+          <code>in&nbsp;activation</code>, wenn die Persona-Datei
+          approved (ADR gelandet) ist, der Agent aber noch nicht für
+          produktiven Output gespawned wurde. Wave-3-Aktivierungen
+          tragen den Status <code>in&nbsp;activation</code>, bis die
+          erste Lieferung landet.
+        </li>
+        <li>
+          <strong>Hash-Pin-Konstante.</strong> Der benannte Export der
+          Persona-Engine, der das Canonical-Subset-SHA-256 der Persona-
+          Definition-Datei pinnt. Der Roh-Hash liegt auf
+          <a href="/de/audit-trail/">dem Audit-Trail</a>; der Konstanten-
+          Name auf jeder Card hält den Inspector lesbar, ohne einen
+          Hash zu duplizieren, der zwischen Surfaces driften könnte.
+        </li>
+        <li>
+          <strong>Konstituierende ADR.</strong> Die Architecture-
+          Decision, die die Rolle aktiviert hat. Reviewer cross-
+          referenzieren Governance über diese ADR-IDs.
+        </li>
+      </ul>
+
+      <h2>Verzeichnis</h2>
+
+      <p>
+        Die Cards sind in natürlicher ADR-Arrival-Order gelistet, damit
+        das Verzeichnis so liest, wie die Org gewachsen ist — nicht
+        alphabetisch.
+      </p>
+
+      <ol class="wakir-persona-inspector-list" aria-label="Persona directory">
+        {samplePersonaInspector.map((entry) => (
+          <li class="wakir-persona-inspector-list__item">
+            <PersonaInspectorEntry entry={entry} />
+          </li>
+        ))}
+      </ol>
+
+      <h2>Was hier noch nicht ist</h2>
+
+      <p>
+        Das ist eine Read-Only-Strukturskizze. Sie unterstützt noch
+        kein Filtern nach Status, keine Suche nach Slug und kein
+        Per-Card-Expand, um den vollen Persona-Definition-Body zu
+        zeigen. Die Persona-Engine emittiert noch keinen JSON-
+        Verzeichnis-Export, den diese Page direkt konsumieren könnte;
+        die Daten oben sind build-time-eingelegt aus
+        <code>src/data/wakir-persona-inspector-sample.ts</code> und
+        spiegeln <code>scripts/lib/wakir-personas.txt</code> (Single
+        Source of Truth für das Rollen-String-Verzeichnis). Wenn die
+        Persona-Engine-Surface einen echten Verzeichnis-Export landet,
+        switcht diese Page um. Bis dahin sind die Cards oben real,
+        aber partiell.
+      </p>
+
+      <h2>Warum diese Page intern-only ist</h2>
+
+      <p>
+        Brand-Guide §9 hält das Rollen-String-Verzeichnis von
+        öffentlichen Surfaces fern. Eine öffentliche Version dieses
+        Verzeichnisses ist deshalb nicht auf der Roadmap. Der
+        Inspector shipt intern-only: <code>noindex,nofollow</code>,
+        kein Canonical, kein OpenGraph, kein hreflang. Externe Leser
+        nutzen <a href="/de/verifier/">den Verifier</a> und
+        <a href="/de/audit-trail/">den Audit-Trail</a> — beide rendern
+        Substanz (Bitcoin-Anker, Pin-Packs, Persona-Hash-Pins) ohne
+        das Rollen-String-Verzeichnis preiszugeben.
+      </p>
+
+      <p>
+        <a href="/persona-inspector/">Read in English</a>.
+      </p>
+    </div>
+  </article>
+</Base>
