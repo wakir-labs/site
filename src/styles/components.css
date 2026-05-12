@@ -1267,3 +1267,160 @@ dd {
 .wakir-audit-trail-entry__external a {
   color: var(--color-accent);
 }
+
+/* -------------------------------------------------------------------------
+ * Persona-inspector entry card (internal-only surface)
+ *
+ * Renders one row of the role-string directory on the internal-only
+ * `/persona-inspector/` page. Visually adjacent to the verifier-result
+ * and audit-trail-entry cards (same chrome, same typography), with a
+ * data-status-driven pill for the activation state. No new colour
+ * tokens; the active / in-activation distinction reuses the accent /
+ * muted palette already in use on the audit-trail timeline.
+ *
+ * The page that hosts these cards emits `<meta name="robots"
+ * content="noindex,nofollow">`, so the styling is intentionally plain
+ * — no marketing-surface flourishes.
+ * ------------------------------------------------------------------------- */
+
+.wakir-persona-inspector-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.wakir-persona-inspector-list__item {
+  margin: 0;
+}
+
+.wakir-persona-inspector__internal-banner {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  background: var(--color-bg-elevated);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-inline);
+  padding: var(--space-2) var(--space-3);
+  margin-block-start: var(--space-3);
+}
+
+.wakir-persona-inspector__internal-banner code {
+  font-family: var(--font-mono);
+}
+
+.wakir-persona-inspector-entry {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-block);
+  padding: var(--space-4);
+  margin-block: 0;
+  font-family: var(--font-sans);
+  color: var(--color-body);
+}
+
+.wakir-persona-inspector-entry__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-block-end: var(--space-3);
+}
+
+.wakir-persona-inspector-entry__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 240px;
+}
+
+.wakir-persona-inspector-entry__slug {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-body);
+  margin: 0;
+}
+
+.wakir-persona-inspector-entry__slug code {
+  font-family: var(--font-mono);
+}
+
+.wakir-persona-inspector-entry__role {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Activation pill. `active` reuses the accent treatment (parity with
+ * the verifier-result `verified` pill); `in-activation` reuses the
+ * muted treatment (parity with the audit-trail `wat-tv-pin-pack`
+ * pill). No new colour tokens. */
+.wakir-persona-inspector-entry__pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-inline);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.wakir-persona-inspector-entry__pill[data-status="in-activation"] {
+  border-color: var(--color-muted);
+  color: var(--color-muted);
+}
+
+.wakir-persona-inspector-entry__domain {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-body);
+  margin-block: 0 var(--space-3);
+}
+
+.wakir-persona-inspector-entry__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin-block-end: var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.wakir-persona-inspector-entry__fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wakir-persona-inspector-entry__fact dt {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.wakir-persona-inspector-entry__fact dd {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-body);
+  margin: 0;
+  word-break: break-all;
+}
+
+.wakir-persona-inspector-entry__note {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin-block: var(--space-2) 0;
+}
