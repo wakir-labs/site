@@ -187,11 +187,11 @@ const articleJsonLd = ogType === "article"
         <nav class="site-header__nav" aria-label="Primary">
           <a href={isEn ? "/about/" : "/de/about/"}>{isEn ? "about" : "über"}</a>
           <a href={isEn ? "/verify/" : "/de/verify/"}>verify</a>
-          <span class="lang-toggle" aria-label="Language">
+          <nav class="lang-toggle" aria-label="Language">
             <a href="/" {...(isEn ? { "aria-current": "page" } : {})}>en</a>
             &middot;
             <a href="/de/" {...(!isEn ? { "aria-current": "page" } : {})}>de</a>
-          </span>
+          </nav>
           <ThemeToggle />
         </nav>
       </div>
