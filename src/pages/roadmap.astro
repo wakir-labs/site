@@ -1,0 +1,217 @@
+---
+/**
+ * Roadmap — public-facing end-user variant of the Wakir Labs build
+ * plan. No date anchors, no ADR ids, no internal milestone numbers;
+ * the substance is what we are building, in what order, and what is
+ * already running today.
+ *
+ * Sister pages:
+ *
+ *   - `/verifier/`     — read the output of a single verifier run
+ *   - `/audit-trail/`  — timeline of artefacts the runtime has anchored
+ *   - `/about/`        — what Wakir Labs is, and how we publish
+ *
+ * Substance source:
+ *   `agents-workspaces/mira/outbox/2026-05-07-roadmap-enduser-skizze.md`
+ *   (Variante 1, supervisory-board approved). Wording on this page is
+ *   the approved substance, lightly smoothed for brand-voice
+ *   consistency with the existing essay surface (about, audit-trail,
+ *   verifier, why-we-are-wakir-labs).
+ *
+ * Brand discipline:
+ *   - Brand-Guide §9: role-strings only, no clear-names, no persona
+ *     count statement on the page. The roadmap names systems
+ *     (audit trail, identity, capability tokens, container
+ *     orchestrator, persona engine), not people.
+ *   - ADR-0048-16 honesty pattern: every "what is next" item is
+ *     described as a build item, not a finished result. The
+ *     roadmap-page is a plan document, not a launch announcement.
+ *   - No date anchors in the running text (supervisory-board
+ *     directive 2026-05-07: end-user variant ships without
+ *     calendar-bound milestones). Sequencing is described in terms
+ *     of dependencies and order, not weeks or quarters.
+ *   - No hype adjectives, no "trustless" badges, no marketing
+ *     pills, no future-proof claims. We describe what we are
+ *     building; the receipts elsewhere on the site decide whether
+ *     it works.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G (Júlia): stage-1 micro-text review pending. The
+ *     wording below is the approved substance, but the running text
+ *     has been smoothed; brand-voice review applies.
+ *   - Supervisory-board pre-go-live review pending. Site-push
+ *     remains dev-engineering hand; this page ships on a feature
+ *     branch.
+ */
+import Base from "../layouts/Base.astro";
+import WakirBrandAssetCard from "../components/WakirBrandAssetCard.astro";
+import NewsletterCTA from "../components/NewsletterCTA.astro";
+
+const title = "Roadmap";
+const description =
+  "What Wakir Labs runs today, what is next, and what comes after. End-user view of the build plan, in order, without date anchors.";
+---
+
+<Base title={title} description={description}>
+  <article class="essay">
+    <header class="essay__header">
+      <p class="essay__meta">
+        <span>Roadmap</span>
+        <span>plan, not announcement</span>
+      </p>
+      <h1 class="essay__title">Roadmap</h1>
+      <p class="essay__lead">
+        What Wakir Labs runs today, what is next on the build, and what
+        comes after. The roadmap is sequenced by dependencies, not by
+        a calendar; the order below is the order we plan to ship in.
+        This is a plan document, not a launch announcement.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <h2>What runs today</h2>
+
+      <p>
+        We operate a pipeline in which every agent action is signed,
+        bound to a capability token, and anchored hourly to the
+        Bitcoin blockchain. An external reviewer can use a
+        command-line tool against a local archive to check whether a
+        reported event is part of the confirmed audit trail. First
+        live data points are embedded on this site &mdash; a
+        multi-hour run with four independent Bitcoin confirmations
+        is linked below.
+      </p>
+
+      <WakirBrandAssetCard
+        variant="medium"
+        crossReferenceHref="/audit-trail/"
+        crossReferenceLabel="See the full audit-trail timeline"
+      />
+
+      <p>
+        Two reading surfaces follow from this:
+        <a href="/verifier/">how to read the output of a single
+        verifier run</a> for the per-receipt verdict, and
+        <a href="/audit-trail/">the audit-trail timeline</a> for the
+        chronological list of artefacts the runtime has anchored.
+      </p>
+
+      <h2>What is next</h2>
+
+      <p>
+        Four build items, in dependency order. Each is in flight; none
+        is finished. The roadmap-page updates when an item lands.
+      </p>
+
+      <ul>
+        <li>
+          <strong>Verifier in the browser.</strong> The audit tool
+          becomes accessible as a small web surface, without the
+          command line. Input: an event id and a local archive.
+          Output: the block heights that carry the event.
+        </li>
+        <li>
+          <strong>Identity system production-ready.</strong> Every
+          agent gets a stable key and a signed persona definition
+          with a deterministic hash. A persona engine handles spawn,
+          recovery, and migration between runtime versions.
+        </li>
+        <li>
+          <strong>Capability tokens with external-library
+          compatibility.</strong> Tokens carry caveats &mdash;
+          <em>only inside a trusted-execution environment</em>,
+          <em>only once</em>, <em>only after a given time</em> &mdash;
+          and are checkable with a publicly-maintained library, not
+          only with our own.
+        </li>
+        <li>
+          <strong>Container orchestrator.</strong> Agents run in
+          containers whose start, migration, and stop are themselves
+          part of the audit trail.
+        </li>
+      </ul>
+
+      <h2>Cross-organisation verification</h2>
+
+      <p>
+        An organisation that runs the system anchors its audit
+        substrate with a publicly-resolvable DNS record. A second
+        organisation can &mdash; without a prior contract, without a
+        central registry &mdash; verify the audit trail of the first.
+        DNS and Bitcoin carry the trust anchors; no third service
+        sits between them. We build the resolver for that inside the
+        substrate. From the outside, only standard protocols are
+        needed.
+      </p>
+
+      <h2>Tech spec</h2>
+
+      <p>
+        Once the five modules &mdash; audit trail, identity,
+        capability tokens, container orchestrator, persona engine
+        &mdash; are stable, a v1 whitepaper freezes the
+        specification for external implementers. Before that, we
+        publish a position paper that describes the modules without
+        committing to spec text, as a substance anchor for early
+        reviewers.
+      </p>
+
+      <h2>Onboarding for external operator organisations</h2>
+
+      <p>Three maturity stages, in order:</p>
+
+      <ul>
+        <li>
+          <strong>Stage 1.</strong> A first external organisation
+          sets up the pipeline self-hosted, with our hands-on
+          guidance.
+        </li>
+        <li>
+          <strong>Stage 2.</strong> Several independent organisations
+          run their own instances in parallel, each with its own
+          DNS-anchored federation document. Cross-organisation
+          verification runs as routine.
+        </li>
+        <li>
+          <strong>Stage 3.</strong> Onboarding is documented and
+          works without our direct involvement. Federation is an
+          open network, not a central system.
+        </li>
+      </ul>
+
+      <h2>Self-migration</h2>
+
+      <p>
+        We migrate our own organisation onto the substrate we build,
+        in parallel. Once that runs stably, the old stack is
+        switched off. We eat what we cook, before anyone else does.
+      </p>
+
+      <h2>Phase 2 and beyond</h2>
+
+      <p>
+        Federation is not the end. Confidential execution, key
+        rotation, recovery paths for lost persona keys, and tooling
+        for external auditors are the next steps. The order is set
+        by the actual demand of the first operator organisations,
+        not by our internal plan.
+      </p>
+
+      <h2>How this page works</h2>
+
+      <p>
+        The roadmap is sequenced by dependencies. We do not put
+        dates on it &mdash; calendar-bound milestones drift, and a
+        published drift turns into a credibility problem we do not
+        need. When a build item lands, this page updates and the
+        artefact shows up on
+        <a href="/audit-trail/">the audit-trail timeline</a>. The
+        timeline is the receipt; this page is the plan.
+      </p>
+
+      <p class="essay__signoff">&mdash; Wakir Labs Editorial</p>
+    </div>
+
+    <NewsletterCTA variant="inline" />
+  </article>
+</Base>
