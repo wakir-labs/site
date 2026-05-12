@@ -1023,3 +1023,247 @@ dd {
   word-break: break-all;
   white-space: pre-wrap;
 }
+
+/* -------------------------------------------------------------------------
+ * Audit-trail entry card
+ *
+ * Renders a single timeline entry on `/audit-trail/`. Visually adjacent
+ * to the verifier-result and brand-asset cards (same chrome, same
+ * typography), but the substance is a single anchored artefact rather
+ * than a verifier verdict. The kind pill colour shifts with the entry
+ * kind — accent for an OTS Bitcoin anchor, muted for a WAT pin pack,
+ * body-on-elevated for a persona hash pin — so a reader scanning the
+ * timeline can tell entry kinds apart without reading the label.
+ *
+ * No new colour tokens; the kind shift is communicated by the
+ * existing palette (accent / muted / body / bg-elevated).
+ * ------------------------------------------------------------------------- */
+
+.wakir-audit-trail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.wakir-audit-trail-list__item {
+  margin: 0;
+}
+
+.wakir-audit-trail-entry {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-block);
+  padding: var(--space-4);
+  margin-block: 0;
+  font-family: var(--font-sans);
+  color: var(--color-body);
+}
+
+.wakir-audit-trail-entry__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-block-end: var(--space-3);
+}
+
+.wakir-audit-trail-entry__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+.wakir-audit-trail-entry__title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-body);
+  margin: 0;
+}
+
+.wakir-audit-trail-entry__subtitle {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* Pill colours by entry kind. `ots-bitcoin-anchor` reuses the accent
+ * border (parity with the verifier-result `verified` pill); `wat-tv-
+ * pin-pack` uses the muted treatment; `persona-hash-pin` uses a
+ * body-on-elevated treatment. We deliberately do not introduce new
+ * colour tokens here. */
+.wakir-audit-trail-entry__pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-inline);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.wakir-audit-trail-entry__pill[data-kind="wat-tv-pin-pack"] {
+  border-color: var(--color-muted);
+  color: var(--color-muted);
+}
+
+.wakir-audit-trail-entry__pill[data-kind="persona-hash-pin"] {
+  border-color: var(--color-body);
+  color: var(--color-body);
+  background: var(--color-bg);
+}
+
+.wakir-audit-trail-entry__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin-block-end: var(--space-4);
+  font-size: var(--text-xs);
+}
+
+.wakir-audit-trail-entry__fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wakir-audit-trail-entry__fact dt {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.wakir-audit-trail-entry__fact dd {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-body);
+  margin: 0;
+  word-break: break-all;
+}
+
+.wakir-audit-trail-entry__pin-hash {
+  cursor: help;
+}
+
+.wakir-audit-trail-entry__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  margin-block-end: var(--space-3);
+}
+
+.wakir-audit-trail-entry__table caption {
+  text-align: start;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-block-end: var(--space-2);
+}
+
+.wakir-audit-trail-entry__table th,
+.wakir-audit-trail-entry__table td {
+  text-align: start;
+  padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.wakir-audit-trail-entry__table th {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wakir-audit-trail-entry__table td a {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+}
+
+.wakir-audit-trail-entry__table tr[data-verdict="pending"] td {
+  color: var(--color-muted);
+}
+
+.wakir-audit-trail-entry__table tr[data-verdict="rejected"] td {
+  color: var(--color-body);
+  font-weight: 600;
+}
+
+.wakir-audit-trail-entry__table tr:last-child td {
+  border-block-end: none;
+}
+
+.wakir-audit-trail-entry__pin-members {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-body);
+  margin-block-end: var(--space-3);
+  padding-inline-start: var(--space-4);
+}
+
+.wakir-audit-trail-entry__pin-members li {
+  word-break: break-all;
+  margin-block: var(--space-1);
+}
+
+.wakir-audit-trail-entry__note {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin-block: var(--space-2) var(--space-3);
+}
+
+.wakir-audit-trail-entry__verify {
+  margin-block-start: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.wakir-audit-trail-entry__verify-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-block-end: var(--space-2);
+}
+
+.wakir-audit-trail-entry__verify-cmd {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: var(--color-code-bg);
+  color: var(--color-code-fg);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-inline);
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.wakir-audit-trail-entry__external {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  margin-block-start: var(--space-3);
+}
+
+.wakir-audit-trail-entry__external a {
+  color: var(--color-accent);
+}

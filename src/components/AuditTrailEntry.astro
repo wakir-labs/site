@@ -1,0 +1,218 @@
+---
+/**
+ * AuditTrailEntry — render a single audit-trail timeline entry.
+ *
+ * Consumes an `AuditTrailEntry` payload (see
+ * `src/data/wakir-audit-trail-sample.ts`) and renders one of three
+ * entry kinds:
+ *
+ *   - "ots-bitcoin-anchor"  — Bitcoin tx + block height + per-calendar
+ *                              branch table; links to the public
+ *                              explorer when known
+ *   - "wat-tv-pin-pack"     — pin-pack header + pinned-member list
+ *   - "persona-hash-pin"    — canonical-subset hash + pinned-constant
+ *                              list + verify command
+ *
+ * The component does not run any verification itself. It renders what
+ * the runtime reported. WAT verification logic is owned by `wat-eng`;
+ * persona-hash-pin logic is owned by `pengine`.
+ *
+ * Brand-Guide §9 (blocklist path):
+ *   - role-strings only, no engineer / persona names in user-visible text
+ *   - no internal workspace paths in user-visible text
+ *   - no persona-count statements
+ *
+ * Brand-Guide §4 / §7 (anti-marketing-speak):
+ *   - factual verbs, no hype adjectives
+ *   - the substance is the pin hash, the block height, and the verdict
+ *   - no animation, no live counter, no "trustless" badge
+ *
+ * Honesty path: when an OTS-anchor entry has pending or rejected
+ * branches, the table shows them as-is. The kind label does not
+ * downgrade — the branches do.
+ */
+import type {
+  AuditTrailEntry,
+  AuditTrailBranch,
+} from "../data/wakir-audit-trail-sample";
+
+interface Props {
+  /** The audit-trail entry payload to render. */
+  entry: AuditTrailEntry;
+  /** Optional override of the explorer base for block-height links. */
+  explorerBlockBaseUrl?: string;
+}
+
+const {
+  entry,
+  explorerBlockBaseUrl = "https://blockstream.info/block-height/",
+} = Astro.props;
+
+const explorerHref = (height: number): string =>
+  `${explorerBlockBaseUrl}${height}`;
+
+/**
+ * Display label for the kind pill. Stays factual; no marketing.
+ */
+const kindLabel = (kind: AuditTrailEntry["kind"]): string => {
+  if (kind === "ots-bitcoin-anchor") return "OTS Bitcoin anchor";
+  if (kind === "wat-tv-pin-pack") return "WAT pin pack";
+  return "Persona hash pin";
+};
+
+/**
+ * Display-shorten a hash for the entry header. Full hash stays in the
+ * `title` attribute and the per-row data attribute so screen readers
+ * and copy-on-click flows can still see it.
+ */
+const shortHash = (hash: string): string => {
+  // Strip any algorithm prefix for the short form.
+  const bare = hash.replace(/^sha256:/, "");
+  if (bare.length <= 16) return bare;
+  return `${bare.slice(0, 8)}…${bare.slice(-6)}`;
+};
+
+/**
+ * Display-shorten a Bitcoin tx id the same way the existing Tag-27
+ * close-out memo formats them: first eight, ellipsis, last six.
+ */
+const shortTxId = (txId: string | undefined): string => {
+  if (!txId) return "—";
+  if (txId.length <= 16) return txId;
+  // The sample data already arrives with `…` ellipsis; honour it.
+  if (txId.includes("…") || txId.includes("...")) return txId;
+  return `${txId.slice(0, 8)}…${txId.slice(-6)}`;
+};
+
+/**
+ * Pick a representative block height for the entry summary when all
+ * `ok` branches resolved to the same height. When branches diverge,
+ * list every distinct height; when no branch is `ok`, return null.
+ */
+const branchHeights = (branches: AuditTrailBranch[]): number[] => {
+  const heights = branches
+    .filter((b) => b.verdict === "ok" && typeof b.blockHeight === "number")
+    .map((b) => b.blockHeight as number);
+  return Array.from(new Set(heights));
+};
+
+const heights = entry.branches ? branchHeights(entry.branches) : [];
+---
+
+<aside
+  class={`wakir-audit-trail-entry wakir-audit-trail-entry--${entry.kind}`}
+  aria-label={`Audit-trail entry: ${entry.label}`}
+>
+  <header class="wakir-audit-trail-entry__header">
+    <div class="wakir-audit-trail-entry__heading">
+      <p class="wakir-audit-trail-entry__title">{entry.label}</p>
+      {entry.subtitle && (
+        <p class="wakir-audit-trail-entry__subtitle">{entry.subtitle}</p>
+      )}
+    </div>
+    <span
+      class="wakir-audit-trail-entry__pill"
+      data-kind={entry.kind}
+      role="status"
+      aria-label="Entry kind"
+    >
+      {kindLabel(entry.kind)}
+    </span>
+  </header>
+
+  <dl class="wakir-audit-trail-entry__facts">
+    <div class="wakir-audit-trail-entry__fact">
+      <dt>Anchored at</dt>
+      <dd>
+        <time datetime={entry.timestamp}>{entry.timestamp}</time>
+      </dd>
+    </div>
+    <div class="wakir-audit-trail-entry__fact">
+      <dt>Pin hash</dt>
+      <dd
+        class="wakir-audit-trail-entry__pin-hash"
+        title={entry.pinHash}
+        data-full-hash={entry.pinHash}
+      >
+        {shortHash(entry.pinHash)}
+      </dd>
+    </div>
+    {heights.length > 0 && (
+      <div class="wakir-audit-trail-entry__fact">
+        <dt>Block height</dt>
+        <dd>
+          {heights.length === 1
+            ? (
+              <a href={explorerHref(heights[0])} rel="external">
+                {heights[0]}
+              </a>
+            )
+            : heights.map((h) => `${h}`).join(", ")}
+        </dd>
+      </div>
+    )}
+  </dl>
+
+  {entry.branches && entry.branches.length > 0 && (
+    <table class="wakir-audit-trail-entry__table">
+      <caption>Per-calendar branches</caption>
+      <thead>
+        <tr>
+          <th scope="col">Calendar</th>
+          <th scope="col">Verdict</th>
+          <th scope="col">Block height</th>
+          <th scope="col">Tx id</th>
+        </tr>
+      </thead>
+      <tbody>
+        {entry.branches.map((b) => (
+          <tr data-verdict={b.verdict}>
+            <td>{b.calendar}</td>
+            <td>{b.verdict}</td>
+            <td>
+              {typeof b.blockHeight === "number" ? (
+                <a href={explorerHref(b.blockHeight)} rel="external">
+                  {b.blockHeight}
+                </a>
+              ) : (
+                "—"
+              )}
+            </td>
+            <td>
+              <code>{shortTxId(b.txId)}</code>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  {entry.pinMembers && entry.pinMembers.length > 0 && (
+    <ul class="wakir-audit-trail-entry__pin-members" aria-label="Pinned members">
+      {entry.pinMembers.map((m) => (
+        <li>
+          <code>{m}</code>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {entry.note && (
+    <p class="wakir-audit-trail-entry__note">{entry.note}</p>
+  )}
+
+  {entry.verifyCommand && (
+    <div class="wakir-audit-trail-entry__verify">
+      <p class="wakir-audit-trail-entry__verify-label">Run yourself</p>
+      <code class="wakir-audit-trail-entry__verify-cmd">{entry.verifyCommand}</code>
+    </div>
+  )}
+
+  {entry.externalLink && (
+    <p class="wakir-audit-trail-entry__external">
+      <a href={entry.externalLink.href} rel="external">
+        {entry.externalLink.label}
+      </a>
+    </p>
+  )}
+</aside>
