@@ -17,9 +17,13 @@
 //      Set in `src/layouts/Base.astro`. That set is hand-maintained to
 //      match `src/pages/de/`, so it doubles as the authoritative list
 //      of EN paths that have a DE mirror.
-//   2. Scan every `src/pages/de/*.astro` for `href="/<slug>/"` where
-//      `/<slug>/` (with leading and trailing slash) is in
-//      `dePagesAvailable`.
+//   2. Scan every `src/pages/de/*.astro` for `href="/<slug>/"` OR
+//      `href="/<slug>"` (with leading slash, trailing slash optional)
+//      where the normalised form `/<slug>/` is in `dePagesAvailable`.
+//      Both shapes are normalised by appending a trailing slash before
+//      Set-lookup. Site convention is trailing-slash-always (matches
+//      Astro's default output URLs), so a no-slash href is itself a
+//      minor drift that the report flags via the `noTrailingSlash` tag.
 //   3. Whitelist the language-switch line — a single short anchor at
 //      the end of an article like `<a href="/<slug>/">Read in English</a>`.
 //      That's the deliberate EN-side exit. Everything else is drift.
@@ -55,9 +59,12 @@ Usage:
   node scripts/check-de-cross-refs.mjs --quiet   only print findings
   node scripts/check-de-cross-refs.mjs --help    this help
 
-Scans every src/pages/de/*.astro for href="/<slug>/" where /<slug>/
-has a DE mirror per src/layouts/Base.astro's dePagesAvailable Set, and
-the line is not the deliberate "Read in English" language-switch.
+Scans every src/pages/de/*.astro for href="/<slug>/" or href="/<slug>"
+where /<slug>/ has a DE mirror per src/layouts/Base.astro's
+dePagesAvailable Set, and the line is not the deliberate "Read in
+English" / "englische Lesehilfe" language-switch. Both slash variants
+are normalised before lookup; a no-trailing-slash href is flagged in
+the finding output for symmetric repair.
 
 Exit 0 on clean, exit 1 on drift.`,
   );
@@ -123,8 +130,11 @@ if (!QUIET) {
 
 // --- Step 3: scan for EN cross-refs ------------------------------------
 
-// hrefMatch[0] = full match, hrefMatch[1] = path with slashes, e.g. /verifier/
-const HREF_RE = /href="(\/[a-z0-9-]+\/)"/g;
+// hrefMatch[0] = full match, hrefMatch[1] = slug without slashes (e.g.
+// "verifier"), hrefMatch[2] = trailing slash if present (either "/" or "").
+// We accept both `href="/verifier/"` and `href="/verifier"` and normalise
+// the slug+trailing-slash form before comparing against dePagesAvailable.
+const HREF_RE = /href="\/([a-z0-9-]+)(\/?)"/g;
 
 // Language-switch whitelist: the exact pattern is a single inline anchor
 // with the body text "Read in English" or close variants. We match on
@@ -135,9 +145,11 @@ const HREF_RE = /href="(\/[a-z0-9-]+\/)"/g;
 //   - "read in english" (case-insensitive fallback)
 //   - "englische Lesehilfe"   (used on /de/impressum/ + /de/datenschutz/
 //     where the EN page is a courtesy redirect, not a full translation)
+// The href in the whitelist also accepts both slash variants for symmetry
+// with the main HREF_RE.
 const LANG_SWITCH_BODY_RES = [
-  /<a\s+href="\/[a-z0-9-]+\/"[^>]*>\s*Read in English\s*<\/a>/i,
-  /<a\s+href="\/[a-z0-9-]+\/"[^>]*>\s*englische\s+Lesehilfe\s*<\/a>/i,
+  /<a\s+href="\/[a-z0-9-]+\/?"[^>]*>\s*Read in English\s*<\/a>/i,
+  /<a\s+href="\/[a-z0-9-]+\/?"[^>]*>\s*englische\s+Lesehilfe\s*<\/a>/i,
 ];
 
 const findings = [];
@@ -152,8 +164,14 @@ for (const pagePath of dePages) {
     HREF_RE.lastIndex = 0;
     let hrefMatch;
     while ((hrefMatch = HREF_RE.exec(line)) !== null) {
-      const path = hrefMatch[1]; // e.g. /verifier/
-      if (!dePagesAvailable.has(path)) continue;
+      const slug = hrefMatch[1]; // e.g. "verifier"
+      const trailingSlash = hrefMatch[2]; // "/" or ""
+      // Normalise to the trailing-slash form for Set-lookup. Site
+      // convention (and dePagesAvailable's storage shape) is always
+      // trailing-slash.
+      const normalisedPath = `/${slug}/`;
+      const observedHref = `/${slug}${trailingSlash}`;
+      if (!dePagesAvailable.has(normalisedPath)) continue;
 
       // Skip the language-switch whitelist: if this very line contains
       // a "Read in English" or "englische Lesehilfe" anchor, the EN-side
@@ -161,14 +179,18 @@ for (const pagePath of dePages) {
       const isLangSwitch = LANG_SWITCH_BODY_RES.some((re) => re.test(line));
       if (isLangSwitch) continue;
 
-      // Determine what the DE counterpart would be.
-      const dePath = path === "/" ? "/de/" : `/de${path}`;
+      // Determine what the DE counterpart would be. Always emit the
+      // normalised (trailing-slash) form so the fix removes both
+      // drift signals at once.
+      const dePath = `/de${normalisedPath}`;
 
       findings.push({
         file: relPath,
         line: i + 1,
-        href: path,
+        href: observedHref,
+        normalisedHref: normalisedPath,
         suggestedHref: dePath,
+        noTrailingSlash: trailingSlash === "",
         excerpt: line.trim().slice(0, 120),
       });
     }
@@ -192,7 +214,7 @@ console.error(
 console.error("");
 for (const f of findings) {
   console.error(`  ${f.file}:${f.line}`);
-  console.error(`    href:        "${f.href}"`);
+  console.error(`    href:        "${f.href}"${f.noTrailingSlash ? "  (missing trailing slash)" : ""}`);
   console.error(`    should be:   "${f.suggestedHref}"`);
   console.error(`    line:        ${f.excerpt}`);
   console.error("");
@@ -202,5 +224,8 @@ console.error(
 );
 console.error(
   'a "Read in English" / "englische Lesehilfe" language-switch (whitelisted).',
+);
+console.error(
+  "Site convention: trailing-slash-always (matches Astro's output URLs).",
 );
 process.exit(1);
