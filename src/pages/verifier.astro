@@ -1,0 +1,162 @@
+---
+/**
+ * Verifier — public-facing page that explains what a Wakir verifier
+ * run produces, and renders a sample run output.
+ *
+ * Sibling page to `/verify/`. The two pages cover different audiences:
+ *
+ *   - `/verify/`   — how a third party uses `ots verify` against any
+ *                    individual commit's `.ots` proof
+ *   - `/verifier/` — how a third party reads the output of
+ *                    `wakir verify`, the Merkle-aware archive verifier
+ *                    that consumes a manifest and reports per-receipt
+ *                    outcomes
+ *
+ * Provisional content. The `wakir verify --output json` flag is in
+ * flight (manifest-v2 verifier stub). Until that lands, this page
+ * renders a build-time inlined sample payload so readers can see the
+ * shape of a result before they have a way to produce one of their
+ * own.
+ *
+ * Cross-Review-Hooks:
+ *   - Comms Zone-G: micro-text review pending. Marketing-text below
+ *     stays factual and follows the established pattern (no hype, no
+ *     marketing-pill, no "trustless" badge).
+ *   - CLI-Output Schema sync with `wat-eng`: this page is a downstream
+ *     consumer; any divergence between the rendered fields and the
+ *     real CLI output needs a paired edit.
+ */
+import Base from "../layouts/Base.astro";
+import VerifierResultCard from "../components/VerifierResultCard.astro";
+import {
+  sampleVerified,
+  samplePartial,
+} from "../data/wakir-verifier-result-sample";
+
+const title = "Read a Wakir verifier result";
+const description =
+  "How a third party reads the output of `wakir verify`, the Merkle-aware archive verifier.";
+---
+
+<Base title={title} description={description}>
+  <article class="essay">
+    <header class="essay__header">
+      <h1 class="essay__title">Read a Wakir verifier result</h1>
+      <p class="essay__lead">
+        <code>wakir verify</code> takes a manifest and an archive of
+        OpenTimestamps receipts, walks every Merkle path, and reports
+        per-receipt outcomes against the Bitcoin chain. This page
+        explains what the output means. The result format is the same
+        whether you ran the verifier yourself or you are reading a
+        result someone else published.
+      </p>
+    </header>
+
+    <div class="essay__body">
+      <p>
+        For verifying a single commit with the upstream
+        <code>ots</code> client, see <a href="/verify/">how to verify
+        a Wakir Labs commit</a>. The page you are reading now is about
+        the archive-level verifier — multiple receipts, multiple
+        calendars, one verdict.
+      </p>
+
+      <h2>What the verifier does</h2>
+
+      <p>
+        Three checks, in order:
+      </p>
+
+      <ol>
+        <li>
+          The manifest matches the archive: every hour-receipt named
+          in the manifest is present, and every receipt's content hash
+          matches.
+        </li>
+        <li>
+          Every Merkle path in the manifest reduces to the
+          OpenTimestamps commitment hash that was actually anchored.
+        </li>
+        <li>
+          Every OpenTimestamps receipt resolves to a Bitcoin block
+          height, via at least one calendar branch. A receipt with all
+          calendar branches anchored is <em>finalised</em>; a receipt
+          with at least one branch still aggregating is <em>pending</em>;
+          a receipt whose Merkle path or commit-binding does not check
+          out is <em>failed</em>.
+        </li>
+      </ol>
+
+      <p>
+        The aggregate verdict is a fold over the per-receipt outcomes.
+        <code>verified</code> means every receipt is finalised;
+        <code>partial</code> means at least one is still pending and
+        none failed; <code>failed</code> means at least one rejected.
+      </p>
+
+      <h2>A sample result</h2>
+
+      <p>
+        The card below is the output of a verifier run against the
+        TV-2 four-hour audit-trail archive. Block heights link to the
+        public Bitcoin block explorer. The data is build-time inlined
+        from <code>src/data/wakir-verifier-result-sample.ts</code>.
+        The <code>wakir verify --output json</code> flag that will
+        produce this shape directly is in flight.
+      </p>
+
+      <VerifierResultCard variant="full" result={sampleVerified} />
+
+      <h2>What a partial result looks like</h2>
+
+      <p>
+        When at least one receipt is still pending — calendar
+        aggregated but not yet anchored to a block — the verdict
+        downgrades to <code>partial</code> and the affected receipt
+        is shown as such. The verifier does not soften this: a
+        partial result is partial.
+      </p>
+
+      <VerifierResultCard variant="full" result={samplePartial} />
+
+      <h2>Reading the per-receipt table</h2>
+
+      <ul>
+        <li>
+          <strong>Hour-slot.</strong> UTC hour-slot identifier of the
+          receipt. Wakir audit trails are aggregated per UTC hour.
+        </li>
+        <li>
+          <strong>Status.</strong> One of <code>finalised</code>,
+          <code>pending</code>, <code>failed</code>. Status reflects
+          the receipt itself, independent of the aggregate verdict.
+        </li>
+        <li>
+          <strong>Block height.</strong> The Bitcoin block height that
+          this receipt's calendar branches resolved to. When every
+          branch agrees on a single height (the common case), the
+          height links to the public block explorer. When branches
+          diverge, every distinct height is listed.
+        </li>
+        <li>
+          <strong>Branches.</strong> A summary of per-calendar
+          branch outcomes, in the form <code>n/m ok</code> with
+          tail counts for any pending or rejected branches.
+        </li>
+      </ul>
+
+      <h2>If the verdict is <code>failed</code></h2>
+
+      <p>
+        A failed verdict means a Merkle path did not reduce to the
+        anchored commitment, or a commit-binding check rejected, or
+        the manifest disagreed with the archive on a hash. None of
+        these are "calendar still pending"; those are
+        <code>partial</code>, not <code>failed</code>. A failed
+        verdict on a real archive is a finding we want to know
+        about — <a href="https://github.com/wakir-labs/site/issues">open
+        an issue</a>.
+      </p>
+    </div>
+  </article>
+</Base>

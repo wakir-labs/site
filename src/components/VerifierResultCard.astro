@@ -1,0 +1,208 @@
+---
+/**
+ * VerifierResultCard — render a single verifier-run result.
+ *
+ * Consumes a `VerifierResult` payload (see
+ * `src/data/wakir-verifier-result-sample.ts`) and renders the verdict,
+ * per-receipt status, per-calendar branch outcomes, and the verify
+ * command that produced the result.
+ *
+ * Two variants:
+ *
+ *   - "summary"  — verdict pill + counts only; for inline contexts
+ *   - "full"     — summary header plus the per-receipt table and the
+ *                  verify-command block
+ *
+ * The component does not run any verification itself. It renders what
+ * the verifier reported. Verification logic is owned by `wat-eng`.
+ *
+ * Brand-Guide §9 (blocklist path):
+ *   - role-strings only, no engineer / persona names in user-visible text
+ *   - no internal workspace paths in user-visible text
+ *   - no persona-count statements
+ *
+ * Brand-Guide §4 / §7 (anti-marketing-speak):
+ *   - factual verbs, no hype adjectives
+ *   - the substance is the verdict, the heights, and the calendars
+ *   - no animation, no live counter, no "trustless" badge
+ *
+ * Honesty path: when the verdict is `partial` or `failed`, the card
+ * does not soften it. The pill text changes; the per-receipt table
+ * shows `pending` and `rejected` rows as-is.
+ */
+import type {
+  VerifierResult,
+  VerifierReceiptResult,
+} from "../data/wakir-verifier-result-sample";
+
+interface Props {
+  /** Format variant. Default "full". */
+  variant?: "summary" | "full";
+  /** The verifier result payload to render. */
+  result: VerifierResult;
+  /** Optional override of the explorer base for block-height links. */
+  explorerBlockBaseUrl?: string;
+}
+
+const {
+  variant = "full",
+  result,
+  explorerBlockBaseUrl = "https://blockstream.info/block-height/",
+} = Astro.props;
+
+const explorerHref = (height: number): string =>
+  `${explorerBlockBaseUrl}${height}`;
+
+/**
+ * Verdict-driven label for the status pill. Wording stays factual and
+ * downgrades automatically — no manual override path.
+ */
+const pillText = (): string => {
+  if (result.verdict === "verified") {
+    return `verified (${result.finalisedCount} of ${result.receiptCount} receipts finalised)`;
+  }
+  if (result.verdict === "partial") {
+    return `partial (${result.finalisedCount} finalised, ${result.pendingCount} pending)`;
+  }
+  return `failed (${result.failedCount} of ${result.receiptCount} receipts rejected)`;
+};
+
+/**
+ * Per-receipt branch summary rendered as `n/m ok` (with `pending` /
+ * `rejected` tail counts when applicable). Keeps the table cell narrow
+ * while preserving the partial/failure detail.
+ */
+const branchSummary = (r: VerifierReceiptResult): string => {
+  const total = r.branchVerdicts.length;
+  const ok = r.branchVerdicts.filter((b) => b.verdict === "ok").length;
+  const pending = r.branchVerdicts.filter((b) => b.verdict === "pending").length;
+  const rejected = r.branchVerdicts.filter((b) => b.verdict === "rejected").length;
+  const tail: string[] = [];
+  if (pending > 0) tail.push(`${pending} pending`);
+  if (rejected > 0) tail.push(`${rejected} rejected`);
+  return tail.length === 0
+    ? `${ok}/${total} ok`
+    : `${ok}/${total} ok, ${tail.join(", ")}`;
+};
+
+/**
+ * Pick a representative block height for the table row when all `ok`
+ * branches resolved to the same height (the common case). When
+ * branches diverge, list every distinct height. When no branch has a
+ * height (pending/failed receipt), return null.
+ */
+const receiptHeights = (r: VerifierReceiptResult): number[] => {
+  const heights = r.branchVerdicts
+    .filter((b) => b.verdict === "ok" && typeof b.blockHeight === "number")
+    .map((b) => b.blockHeight as number);
+  return Array.from(new Set(heights));
+};
+---
+
+<aside
+  class={`wakir-verifier-result wakir-verifier-result--${variant} wakir-verifier-result--${result.verdict}`}
+  aria-label={`Verifier result for ${result.snapshotLabel} — verdict ${result.verdict}`}
+>
+  <header class="wakir-verifier-result__header">
+    <p class="wakir-verifier-result__title">{result.snapshotLabel}</p>
+    <span
+      class="wakir-verifier-result__pill"
+      data-verdict={result.verdict}
+      role="status"
+      aria-label="Verifier verdict"
+    >
+      {pillText()}
+    </span>
+  </header>
+
+  <dl class="wakir-verifier-result__facts">
+    <div class="wakir-verifier-result__fact">
+      <dt>Run at</dt>
+      <dd>
+        <time datetime={result.runAt}>{result.runAt}</time>
+      </dd>
+    </div>
+    <div class="wakir-verifier-result__fact">
+      <dt>Manifest</dt>
+      <dd>{result.manifestVersion}</dd>
+    </div>
+    {typeof result.blockHeightMin === "number" &&
+      typeof result.blockHeightMax === "number" && (
+      <div class="wakir-verifier-result__fact">
+        <dt>Block-height span</dt>
+        <dd>
+          {result.blockHeightMin === result.blockHeightMax
+            ? `${result.blockHeightMin}`
+            : `${result.blockHeightMin}–${result.blockHeightMax}`}
+        </dd>
+      </div>
+    )}
+    <div class="wakir-verifier-result__fact">
+      <dt>Receipts</dt>
+      <dd>
+        {result.finalisedCount} finalised /
+        {" "}{result.pendingCount} pending /
+        {" "}{result.failedCount} failed
+      </dd>
+    </div>
+  </dl>
+
+  {variant === "full" && (
+    <>
+      <table class="wakir-verifier-result__table">
+        <caption>Per-receipt outcomes</caption>
+        <thead>
+          <tr>
+            <th scope="col">Hour-slot (UTC)</th>
+            <th scope="col">Status</th>
+            <th scope="col">Block height</th>
+            <th scope="col">Branches</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.receipts.map((r) => {
+            const heights = receiptHeights(r);
+            return (
+              <tr data-status={r.status}>
+                <td>
+                  <time datetime={`${r.hourSlot}:00:00Z`}>{r.hourSlot}</time>
+                </td>
+                <td>{r.status}</td>
+                <td>
+                  {heights.length === 0
+                    ? "—"
+                    : heights.length === 1
+                      ? (
+                        <a href={explorerHref(heights[0])} rel="external">
+                          {heights[0]}
+                        </a>
+                      )
+                      : heights.map((h) => `${h}`).join(", ")
+                  }
+                </td>
+                <td>{branchSummary(r)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {result.receipts.some((r) => r.note) && (
+        <ul class="wakir-verifier-result__notes" aria-label="Receipt notes">
+          {result.receipts
+            .filter((r) => r.note)
+            .map((r) => (
+              <li>
+                <code>{r.hourSlot}</code>: {r.note}
+              </li>
+            ))}
+        </ul>
+      )}
+
+      <div class="wakir-verifier-result__verify">
+        <p class="wakir-verifier-result__verify-label">Run yourself</p>
+        <code class="wakir-verifier-result__verify-cmd">{result.verifyCommand}</code>
+      </div>
+    </>
+  )}
+</aside>
