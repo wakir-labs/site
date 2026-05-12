@@ -52,6 +52,58 @@ export type AuditTrailEntryKind =
   | "persona-hash-pin";
 
 /**
+ * Manifest-signature gate outcome (Sprint-6 Tag-2 wire-up).
+ *
+ * Mirrors the six pinned values that the runtime's
+ * `wat.verify.manifest_v2.{verify_manifest_v2_file,verify_real_manifest_file}`
+ * Python API reports on `ManifestV2Result.signature_status` /
+ * `RealManifestResult.signature_status`, and that the CLI driver
+ * `scripts/external_verifier_validation.py --real-tvN --verify-signature`
+ * surfaces in its `signature_status=[...]` cohort footer. Paired-update
+ * contract with `wat-eng`; any addition needs a matching
+ * `wat-manifest-v2-spec.md` §5.3 + §11 entry.
+ *
+ * Schema reference: `wakir-wat-manifest-v1/0.2.0` (signature slot
+ * additive, opt-in by verifier). See `docs/external-verifier-driver-
+ * manpage.md` (wakir-runtime) for the CLI surface.
+ *
+ *  - `""`                    : verification not requested (the runtime
+ *                              default; opt-in surface). The component
+ *                              renders no signature row when every
+ *                              value is the empty string.
+ *  - `"verified"`            : signature slot present, cryptographically
+ *                              verified. Brand-accent visual.
+ *  - `"unsigned-permissive"` : no slot, permissive mode accepted.
+ *                              Neutral / muted visual.
+ *  - `"unsigned-strict"`     : no slot, strict mode rejected (the
+ *                              verifier forces `integrity_ok=False`).
+ *                              Body-emphasis visual.
+ *  - `"mismatch"`            : slot present and well-formed, did NOT
+ *                              verify cryptographically. Body-emphasis
+ *                              visual.
+ *  - `"structural-error"`    : slot malformed or public-key missing
+ *                              under a signed-manifest path.
+ *                              Body-emphasis visual.
+ *
+ * Brand-Guide §8 deviation note: the runtime uses six discrete
+ * verdicts, but the brand palette pins only sand-gold accent / warm
+ * off-white body / muted as the verdict-shift vocabulary. The Box-spec
+ * called for "Brand-grün / Brand-warning / neutral"; we did NOT
+ * introduce new colour tokens because the brand-guide explicitly
+ * pins three colours and the existing verifier-result + audit-trail
+ * components use the same accent / muted / body trio for verdict
+ * communication. Júlia (Comms Zone-G) reviews the visual mapping
+ * before any user-facing deployment.
+ */
+export type SignatureStatus =
+  | ""
+  | "verified"
+  | "unsigned-permissive"
+  | "unsigned-strict"
+  | "mismatch"
+  | "structural-error";
+
+/**
  * Per-calendar branch outcome for an OTS-Bitcoin-anchor entry. Mirrors
  * the per-branch shape used by the verifier-result component.
  */
@@ -112,6 +164,25 @@ export interface AuditTrailEntry {
   };
   /** Optional human-readable note (e.g. "1-of-6 confirmations"). */
   note?: string;
+  /**
+   * Manifest-signature gate outcome (Sprint-6 Tag-2 wire-up).
+   *
+   * - A single `SignatureStatus` value describes a single-manifest
+   *   entry (one hour-receipt; one verdict).
+   * - An array describes a multi-manifest cohort entry (e.g. the TV-2
+   *   four-hour cohort; one verdict per hour-receipt). The array
+   *   mirrors the runtime's `signature_status=[...]` CLI footer.
+   * - Absent / `undefined` means the entry pre-dates the signature
+   *   gate wire-up. The component renders nothing in that case.
+   * - The string `""` means the gate was not requested for this
+   *   entry. The component also renders nothing in that case.
+   *
+   * Only meaningful on `ots-bitcoin-anchor` and `wat-tv-pin-pack`
+   * entries today. Persona-hash-pin entries have no signature slot
+   * in the runtime contract (`wat.verify.manifest_v2` operates on
+   * WAT manifests, not on persona definitions).
+   */
+  signatureStatus?: SignatureStatus | SignatureStatus[];
 }
 
 /**
@@ -130,6 +201,10 @@ export interface AuditTrailEntry {
  *     two calendars confirmed in the same block)
  *   - TV-2 multi-hour anchor (already used by the brand-asset card,
  *     four hour-receipts, four calendars, blocks 948198-948254)
+ *   - Phase-2 Sprint-6 Tag-2 (β-push `c79b2f6`), CLI driver-mode
+ *     `--real-tvN --verify-signature` landed; the TV-2 + TV-3 cohort
+ *     entries below now carry `signatureStatus` arrays sourced
+ *     verbatim from the driver footer.
  */
 export const sampleAuditTrail: AuditTrailEntry[] = [
   {
@@ -219,6 +294,12 @@ export const sampleAuditTrail: AuditTrailEntry[] = [
     },
     verifyCommand: "ots verify path/to/receipt.ots",
     note: "Spot-check at 1-of-6 confirmations; full closure expected ~28 h post-submit.",
+    // Sprint-6 Tag-2 driver-mode acceptance, 2026-05-11:
+    //   $ python scripts/external_verifier_validation.py \
+    //       --real-tv3 --verify-signature --python-only --quiet
+    //   verify_real_manifest_file (signed cohort) OK
+    //       (1 hour-receipts, signature_status=['verified'])
+    signatureStatus: ["verified"],
   },
   {
     id: "ots-tv-2-bitcoin-anchor-948254",
@@ -240,6 +321,14 @@ export const sampleAuditTrail: AuditTrailEntry[] = [
     },
     verifyCommand: "wakir verify --archive .runtime/wat-tv2-archive",
     note: "TV-2 brand-asset closing datapoint; full archive spans blocks 948198-948254.",
+    // Sprint-6 Tag-2 driver-mode acceptance, 2026-05-11:
+    //   $ python scripts/external_verifier_validation.py \
+    //       --real-tv2 --verify-signature --python-only
+    //   verify_real_manifest_file (signed cohort) OK
+    //       (4 hour-receipts, signature_status=['verified'])
+    // The four-element array mirrors the runtime cohort footer one-to-one
+    // (one verdict per hour-receipt across the TV-2 multi-hour archive).
+    signatureStatus: ["verified", "verified", "verified", "verified"],
   },
   {
     id: "ots-tv-2-bitcoin-anchor-948198",
@@ -261,5 +350,11 @@ export const sampleAuditTrail: AuditTrailEntry[] = [
     },
     verifyCommand: "wakir verify --archive .runtime/wat-tv2-archive",
     note: "TV-2 brand-asset opening datapoint.",
+    // Same TV-2 cohort run as the closing-receipt entry above: the
+    // driver runs verify_real_manifest_file once per cohort and reports
+    // a single signature_status array over all hour-receipts. We
+    // duplicate the array shape here so a reader who lands on this
+    // entry first sees the same provenance.
+    signatureStatus: ["verified", "verified", "verified", "verified"],
   },
 ];

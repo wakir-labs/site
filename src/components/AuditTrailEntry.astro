@@ -30,10 +30,41 @@
  * Honesty path: when an OTS-anchor entry has pending or rejected
  * branches, the table shows them as-is. The kind label does not
  * downgrade — the branches do.
+ *
+ * Signature-status wire-up (Sprint-6 Tag-2, paired with wakir-runtime
+ * β-push `c79b2f6`): when an entry carries a `signatureStatus` value,
+ * a small status pill renders below the kind pill describing the
+ * outcome of the manifest-signature gate. Six pinned outcomes (see
+ * `SignatureStatus` in the data module). Multi-hour cohorts render as
+ * either a single "verified (N hours)" summary when every value is
+ * `verified` (the brand-demo path) or as an explicit comma-separated
+ * list when any value diverges (the honesty path — a single
+ * `"mismatch"` or `"structural-error"` in the cohort breaks the
+ * summary).
+ *
+ * Visual mapping respects Brand-Guide §8 (sand-gold accent / warm
+ * off-white body / muted, no new colour tokens):
+ *
+ *   - `verified`            : accent (parity with the verifier-result
+ *                             `verified` pill and the OTS-anchor kind
+ *                             pill).
+ *   - `unsigned-permissive` : muted (factual, not-rejected — same
+ *                             treatment the pin-pack kind pill uses).
+ *   - `unsigned-strict`     : body-emphasis (rejected; matches the
+ *                             verifier-result `failed` pill).
+ *   - `mismatch`            : body-emphasis (rejected).
+ *   - `structural-error`    : body-emphasis (rejected).
+ *
+ * The Box-spec called for "Brand-grün / Brand-warning / neutral";
+ * we deviate intentionally because the brand-guide pins three colours
+ * and the sibling verifier-result + audit-trail components signal
+ * verdicts via the same accent / muted / body trio. Júlia (Comms
+ * Zone-G) reviews this mapping before any user-facing deployment.
  */
 import type {
   AuditTrailEntry,
   AuditTrailBranch,
+  SignatureStatus,
 } from "../data/wakir-audit-trail-sample";
 
 interface Props {
@@ -97,11 +128,142 @@ const branchHeights = (branches: AuditTrailBranch[]): number[] => {
 };
 
 const heights = entry.branches ? branchHeights(entry.branches) : [];
+
+/**
+ * Normalise the entry's `signatureStatus` field into an array. Three
+ * inbound shapes (per data module):
+ *
+ *   - `undefined`              : entry pre-dates the wire-up.
+ *   - `""` (single empty)      : gate was not requested.
+ *   - `SignatureStatus`        : single-manifest result.
+ *   - `SignatureStatus[]`      : multi-manifest cohort.
+ *
+ * Returns the empty array when nothing should render.
+ */
+const signatureStatusValues = (
+  raw: SignatureStatus | SignatureStatus[] | undefined,
+): SignatureStatus[] => {
+  if (raw === undefined) return [];
+  const arr = Array.isArray(raw) ? raw : [raw];
+  // Drop the empty-string "not requested" sentinel from rendering;
+  // a cohort that is fully empty-string never produces a row. A
+  // cohort that mixes "" with a real status renders only the real
+  // statuses (a future runtime change cannot accidentally emit
+  // a stray "" that visually hides verified hours).
+  return arr.filter((v): v is SignatureStatus => v !== "");
+};
+
+/**
+ * Classification helper. Maps each pinned status to one of three
+ * visual classes used by the CSS pill (`accent` / `muted` / `body`).
+ * Pinned in CSS via `data-signature-tone` to keep the markup
+ * decoupled from selector cascade order.
+ */
+const signatureTone = (
+  status: SignatureStatus,
+): "accent" | "muted" | "body" | "none" => {
+  if (status === "verified") return "accent";
+  if (status === "unsigned-permissive") return "muted";
+  if (
+    status === "unsigned-strict" ||
+    status === "mismatch" ||
+    status === "structural-error"
+  ) {
+    return "body";
+  }
+  // "" path is filtered upstream; defensive default.
+  return "none";
+};
+
+/**
+ * Aggregate tone for a multi-status cohort. `verified` × N reuses the
+ * accent tone (brand-demo happy path); any non-verified status in the
+ * cohort downgrades to `body` so a reader cannot miss the honesty
+ * signal at scan-distance. Mixed-permissive (no verified, no failed)
+ * stays muted.
+ */
+const cohortTone = (
+  values: SignatureStatus[],
+): "accent" | "muted" | "body" => {
+  if (values.length === 0) return "muted";
+  const allVerified = values.every((v) => v === "verified");
+  if (allVerified) return "accent";
+  const anyFailed = values.some(
+    (v) =>
+      v === "mismatch" ||
+      v === "unsigned-strict" ||
+      v === "structural-error",
+  );
+  if (anyFailed) return "body";
+  return "muted";
+};
+
+/**
+ * Human label for a single status. Stays factual; no marketing.
+ */
+const signatureLabel = (status: SignatureStatus): string => {
+  switch (status) {
+    case "verified":
+      return "verified";
+    case "unsigned-permissive":
+      return "unsigned (permissive)";
+    case "unsigned-strict":
+      return "unsigned (strict, rejected)";
+    case "mismatch":
+      return "mismatch";
+    case "structural-error":
+      return "structural error";
+    default:
+      return "";
+  }
+};
+
+/**
+ * Cohort-level summary string. Reuses single-value labels when the
+ * cohort is homogeneous (every value identical), otherwise emits a
+ * comma-joined list "verified, mismatch, …" so the honesty path is
+ * literal — the UI never aggregates a failed hour out of view.
+ */
+const signatureSummary = (values: SignatureStatus[]): string => {
+  if (values.length === 0) return "";
+  if (values.length === 1) return signatureLabel(values[0]);
+  const distinct = Array.from(new Set(values));
+  if (distinct.length === 1) {
+    return `${signatureLabel(distinct[0])} (${values.length} hours)`;
+  }
+  return distinct.map(signatureLabel).join(", ");
+};
+
+const sigValues = signatureStatusValues(entry.signatureStatus);
+const sigTone = cohortTone(sigValues);
+const sigSummary = signatureSummary(sigValues);
+// `data-signature-summary` is the page-level filter discriminator
+// (see `audit-trail.astro` filter `<details>`): "verified" /
+// "unverified" / "mixed" / "none". "verified" iff every value is
+// `verified`; "unverified" iff at least one value is rejected
+// (mismatch / unsigned-strict / structural-error); "mixed" iff
+// values diverge but no rejection is present (e.g. a future cohort
+// that mixes permissive-unsigned with verified); "none" iff the
+// entry carries no signature row at all.
+const sigFilterTag =
+  sigValues.length === 0
+    ? "none"
+    : sigValues.every((v) => v === "verified")
+      ? "verified"
+      : sigValues.some(
+          (v) =>
+            v === "mismatch" ||
+            v === "unsigned-strict" ||
+            v === "structural-error",
+        )
+        ? "unverified"
+        : "mixed";
 ---
 
 <aside
   class={`wakir-audit-trail-entry wakir-audit-trail-entry--${entry.kind}`}
   aria-label={`Audit-trail entry: ${entry.label}`}
+  data-signature-summary={sigFilterTag}
 >
   <header class="wakir-audit-trail-entry__header">
     <div class="wakir-audit-trail-entry__heading">
@@ -110,14 +272,27 @@ const heights = entry.branches ? branchHeights(entry.branches) : [];
         <p class="wakir-audit-trail-entry__subtitle">{entry.subtitle}</p>
       )}
     </div>
-    <span
-      class="wakir-audit-trail-entry__pill"
-      data-kind={entry.kind}
-      role="status"
-      aria-label="Entry kind"
-    >
-      {kindLabel(entry.kind)}
-    </span>
+    <div class="wakir-audit-trail-entry__pills">
+      <span
+        class="wakir-audit-trail-entry__pill"
+        data-kind={entry.kind}
+        role="status"
+        aria-label="Entry kind"
+      >
+        {kindLabel(entry.kind)}
+      </span>
+      {sigValues.length > 0 && (
+        <span
+          class="wakir-audit-trail-entry__pill wakir-audit-trail-entry__pill--signature"
+          data-signature-tone={sigTone}
+          role="status"
+          aria-label="Manifest-signature gate outcome"
+          title={sigValues.join(", ")}
+        >
+          signature: {sigSummary}
+        </span>
+      )}
+    </div>
   </header>
 
   <dl class="wakir-audit-trail-entry__facts">
@@ -151,6 +326,17 @@ const heights = entry.branches ? branchHeights(entry.branches) : [];
         </dd>
       </div>
     )}
+    {sigValues.length > 0 && (
+      <div class="wakir-audit-trail-entry__fact">
+        <dt>Signature gate</dt>
+        <dd
+          class="wakir-audit-trail-entry__signature-fact"
+          data-signature-tone={sigTone}
+        >
+          {sigSummary}
+        </dd>
+      </div>
+    )}
   </dl>
 
   {entry.branches && entry.branches.length > 0 && (
@@ -181,6 +367,29 @@ const heights = entry.branches ? branchHeights(entry.branches) : [];
             <td>
               <code>{shortTxId(b.txId)}</code>
             </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  {sigValues.length > 1 && (
+    <table
+      class="wakir-audit-trail-entry__table wakir-audit-trail-entry__sig-table"
+      aria-label="Per-hour manifest-signature gate outcome"
+    >
+      <caption>Per-hour signature gate</caption>
+      <thead>
+        <tr>
+          <th scope="col">Hour</th>
+          <th scope="col">Signature status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sigValues.map((s, i) => (
+          <tr data-signature-tone={signatureTone(s)}>
+            <td>{i + 1}</td>
+            <td>{signatureLabel(s)}</td>
           </tr>
         ))}
       </tbody>
