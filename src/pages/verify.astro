@@ -11,13 +11,24 @@ const description =
   <header class="essay__header">
     <h1 class="essay__title">Verify a Wakir Labs commit</h1>
     <p class="essay__lead">
-    Every commit in Wakir Labs repositories is timestamped against the
-    Bitcoin blockchain via <a href="https://opentimestamps.org">OpenTimestamps</a>.
-    The proof is a small <code>.ots</code> file checked in next to the
-    commit hash. With those two things — <em>any commit hash from our
-    history</em> and <em>the matching <code>.ots</code> file</em> — anyone
-    can verify, without trusting us, that the commit existed at or before
-    the timestamp baked into a specific Bitcoin block.
+    Commits in <em>this</em> repository — and in our internal governance
+    history — are timestamped against the Bitcoin blockchain via
+    <a href="https://opentimestamps.org">OpenTimestamps</a>. The proof is a
+    small <code>.ots</code> file checked in next to the commit hash. With
+    those two things — <em>a commit hash</em> and <em>the matching
+    <code>.ots</code> file</em> — anyone can verify, without trusting us,
+    that the commit existed at or before the timestamp baked into a
+    specific Bitcoin block.
+    </p>
+    <p class="essay__lead">
+    <strong>What is not covered, measured 2026-09-15:</strong> the three code
+    repositories — <code>wakir-runtime</code>, <code>wakir-protocol</code>,
+    <code>wakir-verify</code> — carry <em>no</em> per-commit proofs; they have
+    no <code>meta/timestamps/</code> directory at all. An earlier version of
+    this page claimed every commit in every Wakir Labs repository was
+    timestamped. It was not. Whether to extend commit stamping to those
+    repositories is an open decision; until it is made, this page describes
+    only what actually exists.
     </p>
   </header>
 
@@ -69,15 +80,18 @@ ls meta/timestamps/</code></pre>
   </p>
 
   <pre><code># From inside the cloned repo:
-ots verify meta/timestamps/82d40f7.ots -d $(git rev-parse 82d40f7 | xxd -r -p | sha256sum | head -c 64)</code></pre>
+printf "%s\n" "$(git rev-parse 82d40f7)" &gt; /tmp/commit.txt
+ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
-    The simpler form, when the proof was created against the raw commit
-    hash bytes used by our hook, is:
+    What the hook stamps is the 40-character commit hash <em>as ASCII
+    text, with a trailing newline</em> — that is what
+    <code>printf "%s\n"</code> reproduces. Two earlier versions of this
+    page told you to feed the raw hash bytes (<code>xxd -r -p</code>)
+    instead; that does not match, and <code>ots</code> rejects it with
+    <code>File does not match original!</code>. Corrected 2026-09-15
+    after checking both published forms against the example above.
   </p>
-
-  <pre><code>git rev-parse 82d40f7 | xxd -r -p &gt; /tmp/commit.bin
-ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
     A successful verification prints something like:
@@ -141,8 +155,10 @@ ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
     </li>
     <li>
       <strong>You hashed the wrong thing.</strong> Our hook stamps the
-      raw 32-byte commit hash. Make sure you pass binary bytes
-      (<code>xxd -r -p</code>), not the ASCII hex.
+      40-character commit hash as ASCII text with a trailing newline.
+      Reproduce it with
+      <code>printf "%s\n" "$(git rev-parse &lt;commit&gt;)"</code> —
+      not with <code>xxd -r -p</code>.
     </li>
   </ul>
 
