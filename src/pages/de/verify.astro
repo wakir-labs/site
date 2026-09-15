@@ -11,14 +11,25 @@ const description =
   <header class="essay__header">
     <h1 class="essay__title">Einen Wakir-Labs-Commit verifizieren</h1>
     <p class="essay__lead">
-    Jeder Commit in den Wakir-Labs-Repositories wird per
+    Commits in <em>diesem</em> Repository — und in unserer internen
+    Governance-Historie — werden per
     <a href="https://opentimestamps.org">OpenTimestamps</a> gegen die
     Bitcoin-Blockchain zeitgestempelt. Der Beweis ist eine kleine
     <code>.ots</code>-Datei, die zusammen mit dem Commit-Hash eingecheckt
-    wird. Mit diesen beiden Dingen — <em>einem beliebigen Commit-Hash aus
-    unserer Historie</em> und <em>der zugehörigen <code>.ots</code>-Datei</em>
-    — kann jede:r ohne Vertrauen in uns nachweisen, dass der Commit zum
-    Zeitpunkt eines bestimmten Bitcoin-Blocks bereits existierte.
+    wird. Mit diesen beiden Dingen — <em>einem Commit-Hash</em> und
+    <em>der zugehörigen <code>.ots</code>-Datei</em> — kann jede:r ohne
+    Vertrauen in uns nachweisen, dass der Commit zum Zeitpunkt eines
+    bestimmten Bitcoin-Blocks bereits existierte.
+    </p>
+    <p class="essay__lead">
+    <strong>Was nicht abgedeckt ist, gemessen am 2026-09-15:</strong> Die drei
+    Code-Repositories — <code>wakir-runtime</code>, <code>wakir-protocol</code>,
+    <code>wakir-verify</code> — tragen <em>keine</em> Commit-Beweise; sie haben
+    gar kein <code>meta/timestamps/</code>-Verzeichnis. Eine frühere Fassung
+    dieser Seite behauptete, jeder Commit in jedem Wakir-Labs-Repository sei
+    zeitgestempelt. Das stimmte nicht. Ob die Commit-Stempelung auf diese
+    Repositories ausgeweitet wird, ist offen; bis dahin beschreibt diese Seite
+    nur, was es tatsächlich gibt.
     </p>
   </header>
 
@@ -71,8 +82,19 @@ ls meta/timestamps/</code></pre>
   </p>
 
   <pre><code># Aus dem geklonten Repo heraus:
-git rev-parse 82d40f7 | xxd -r -p &gt; /tmp/commit.bin
-ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
+printf "%s\n" "$(git rev-parse 82d40f7)" &gt; /tmp/commit.txt
+ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
+
+  <p>
+    Gestempelt wird der 40-stellige Commit-Hash <em>als ASCII-Text mit
+    abschließendem Zeilenumbruch</em> — genau das erzeugt
+    <code>printf "%s\n"</code>. Zwei frühere Fassungen dieser Seite
+    verlangten stattdessen die rohen Hash-Bytes
+    (<code>xxd -r -p</code>); das passt nicht, und <code>ots</code>
+    antwortet mit <code>File does not match original!</code>.
+    Korrigiert am 2026-09-15, nachdem beide veröffentlichten Formen am
+    obigen Beispiel geprüft wurden.
+  </p>
 
   <p>
     Eine erfolgreiche Verifikation gibt etwa aus:
@@ -136,9 +158,11 @@ ots verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
       dann erneut verifizieren.
     </li>
     <li>
-      <strong>Falsches Eingangs-Hashing.</strong> Unser Hook stempelt den
-      rohen 32-Byte-Commit-Hash. Es müssen Binär-Bytes übergeben werden
-      (<code>xxd -r -p</code>), nicht der ASCII-Hex-String.
+      <strong>Du hast das Falsche gehasht.</strong> Gestempelt wird der
+      40-stellige Commit-Hash als ASCII-Text mit abschließendem
+      Zeilenumbruch. Erzeuge ihn mit
+      <code>printf "%s\n" "$(git rev-parse &lt;commit&gt;)"</code> —
+      nicht mit <code>xxd -r -p</code>.
     </li>
   </ul>
 
