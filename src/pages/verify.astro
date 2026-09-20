@@ -98,7 +98,7 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
     writes. Two earlier versions of this page told you to feed the raw hash
     bytes (<code>xxd -r -p</code>) instead. That is not what was stamped, so
     <code>ots</code> rejects it with <code>File does not match
-    original!</code>. We found this on 2026-09-15, the first time anyone ran
+    original!</code>. We found this on 2026-09-15 by running
     this page's own worked example end to end. Both published forms are
     corrected.
   </p>
@@ -112,7 +112,8 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
   <p>
     That is the receipt. The commit existed at or before that Bitcoin
     block. No trust in us required — only in Bitcoin and in the
-    OpenTimestamps calendar servers, which sign but cannot back-date.
+    OpenTimestamps calendar servers, which only sign; they do not
+    back-date.
   </p>
 
   <h2>The corporate repository</h2>
