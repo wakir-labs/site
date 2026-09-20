@@ -84,6 +84,19 @@ ls meta/timestamps/</code></pre>
     dessen Kurz-Hash.
   </p>
 
+  <p>
+    <strong>Nicht jede Datei nennt einen Commit, den Du auschecken kannst.</strong>
+    Gemessen am 2026-09-20: Von 60 Beweisdateien lösen 28 in einem einfachen Klon
+    auf. Der Rest wurde auf Branch-Commits gestempelt, die der Squash-Merge ersetzt
+    hat — der Hash überlebt im Dateinamen, nicht in der Historie von
+    <code>main</code>. Nimm eine, die auflöst; das Beispiel unten gehört dazu:
+  </p>
+
+  <pre><code>for f in meta/timestamps/*.ots; do
+  h=$(basename "$f" .ots)
+  git cat-file -e "$h^{commit}" 2&gt;/dev/null &amp;&amp; echo "$h"
+done</code></pre>
+
   <h3>3. <code>ots verify</code> ausführen</h3>
 
   <p>
@@ -136,13 +149,35 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
     Der Aufsichtsrat prüft seinen lokalen Klon auf genau demselben Weg.
   </p>
 
-  <h2>Fortgeschritten: gegen den eigenen Bitcoin-Node prüfen</h2>
+  <h2>Schritt 3 braucht einen Bitcoin-Node — oder einen zweiten Befehl</h2>
 
   <p>
-    Standardmäßig sprechen die OpenTimestamps-Tools mit öffentlichen
-    Calendar-Servern und, für die Bitcoin-Attestierung, mit einem
-    Remote-Block-Explorer. Mit eigenem Bitcoin-Node lässt sich der Beweis
-    Ende-zu-Ende gegen die selbst validierte Chain prüfen:
+    <code>ots verify</code> kommt ohne Node nicht zum Ende. Gemessen am
+    2026-09-20 gegen <code>opentimestamps-client</code> 0.7.2, also genau die
+    Version aus dem <code>pip install</code> oben: Das Paket enthält keinerlei
+    Block-Explorer-Pfad, und der Verify-Weg ruft <code>setup_bitcoin()</code>
+    bedingungslos auf, was ohne antwortenden Node mit Exit 1 endet. Eine
+    frühere Fassung dieser Seite behauptete einen Rückgriff auf einen
+    Remote-Block-Explorer. Den gibt es nicht.
+  </p>
+
+  <p>
+    <strong>Ohne Node</strong> hilft <code>ots info</code> — der Befehl braucht
+    keinen Chain-Zugriff und nennt den Bitcoin-Block, auf den sich der Beweis
+    festlegt:
+  </p>
+
+  <pre><code>ots info meta/timestamps/82d40f7.ots | grep BitcoinBlockHeaderAttestation</code></pre>
+
+  <p>
+    Diese Blockhöhe in einem beliebigen Bitcoin-Explorer nachschlagen und den
+    Zeitstempel des Blocks lesen. Das ist dieselbe Tatsache, die
+    <code>ots verify</code> bestätigen würde — nur vertraust Du dabei dem
+    Explorer statt selbst zu prüfen.
+  </p>
+
+  <p>
+    <strong>Mit eigenem Node</strong> macht der Client die ganze Kette selbst:
   </p>
 
   <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>

@@ -77,9 +77,22 @@ cd site
 ls meta/timestamps/</code></pre>
 
   <p>
-    Each file is the <code>.ots</code> attestation for one commit,
-    indexed by the commit's short hash.
+    Each file is the <code>.ots</code> attestation for one commit, indexed by
+    the commit's short hash.
   </p>
+
+  <p>
+    <strong>Not every file names a commit you can check out.</strong> Measured
+    on 2026-09-20: of 60 proof files, 28 resolve in a plain clone. The rest were
+    stamped on branch commits that squash-merging replaced, so the hash survives
+    in the filename but not in <code>main</code>'s history. Pick one that
+    resolves — the worked example below is one of them:
+  </p>
+
+  <pre><code>for f in meta/timestamps/*.ots; do
+  h=$(basename "$f" .ots)
+  git cat-file -e "$h^{commit}" 2&gt;/dev/null &amp;&amp; echo "$h"
+done</code></pre>
 
   <h3>3. Run <code>ots verify</code></h3>
 
@@ -134,13 +147,35 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
     the corporate repository the same way.
   </p>
 
-  <h2>Advanced: verify against your own Bitcoin node</h2>
+  <h2>Step 3 needs a Bitcoin node — or a second command</h2>
 
   <p>
-    By default the OpenTimestamps client reaches out to public calendar
-    servers and, for the Bitcoin attestation, to a remote block explorer.
-    If you run your own Bitcoin node, you can verify the proof end-to-end
-    against your own copy of the chain:
+    <code>ots verify</code> does not finish without one. Measured against
+    <code>opentimestamps-client</code> 0.7.2 — the version the
+    <code>pip install</code> above gives you — on 2026-09-20: the package
+    contains no block-explorer code path at all, and the verify path calls
+    <code>setup_bitcoin()</code> unconditionally, which exits 1 when no node
+    answers. An earlier version of this page said the client falls back to a
+    remote block explorer. It does not.
+  </p>
+
+  <p>
+    <strong>Without a node</strong>, use <code>ots info</code>, which needs no
+    chain access. It prints the Bitcoin block the proof commits to:
+  </p>
+
+  <pre><code>ots info meta/timestamps/82d40f7.ots | grep BitcoinBlockHeaderAttestation</code></pre>
+
+  <p>
+    Take that block height to any Bitcoin explorer and read its timestamp.
+    That is the same fact <code>ots verify</code> would confirm — you are
+    trusting the explorer to report the chain correctly instead of checking
+    it yourself.
+  </p>
+
+  <p>
+    <strong>With your own node</strong>, the client does the whole chain
+    end to end:
   </p>
 
   <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
