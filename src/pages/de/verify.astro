@@ -12,24 +12,14 @@ const description =
     <h1 class="essay__title">Einen Wakir-Labs-Commit verifizieren</h1>
     <p class="essay__lead">
     Commits in <em>diesem</em> Repository — und in unserer internen
-    Governance-Historie — werden per
+    Governance-Historie — werden über
     <a href="https://opentimestamps.org">OpenTimestamps</a> gegen die
     Bitcoin-Blockchain zeitgestempelt. Der Beweis ist eine kleine
-    <code>.ots</code>-Datei, die zusammen mit dem Commit-Hash eingecheckt
-    wird. Mit diesen beiden Dingen — <em>einem Commit-Hash</em> und
-    <em>der zugehörigen <code>.ots</code>-Datei</em> — kann jede:r ohne
-    Vertrauen in uns nachweisen, dass der Commit zum Zeitpunkt eines
-    bestimmten Bitcoin-Blocks bereits existierte.
-    </p>
-    <p class="essay__lead">
-    <strong>Was nicht abgedeckt ist, gemessen am 2026-09-15:</strong> Die drei
-    Code-Repositories — <code>wakir-runtime</code>, <code>wakir-protocol</code>,
-    <code>wakir-verify</code> — tragen <em>keine</em> Commit-Beweise; sie haben
-    gar kein <code>meta/timestamps/</code>-Verzeichnis. Eine frühere Fassung
-    dieser Seite behauptete, jeder Commit in jedem Wakir-Labs-Repository sei
-    zeitgestempelt. Das stimmte nicht. Ob die Commit-Stempelung auf diese
-    Repositories ausgeweitet wird, ist offen; bis dahin beschreibt diese Seite
-    nur, was es tatsächlich gibt.
+    <code>.ots</code>-Datei, die neben dem Commit-Hash eingecheckt wird.
+    Mehr braucht es nicht: Mit <em>einem Commit-Hash</em> und <em>der
+    passenden <code>.ots</code>-Datei</em> lässt sich ohne Vertrauen in uns
+    belegen, dass der Commit spätestens zum Zeitpunkt eines bestimmten
+    Bitcoin-Blocks existiert hat.
     </p>
   </header>
 
@@ -37,8 +27,28 @@ const description =
 
   <p>
     Das ist die öffentliche Seite von <em>Proof-of-History in der
-    Praxis</em>. Genau das meinen wir, wenn wir sagen, die Dokumentation
-    ist verankert.
+    Praxis</em>. Genau das meinen wir, wenn wir sagen, unsere
+    Dokumentation sei verankert.
+  </p>
+
+  <h2>Was abgedeckt ist</h2>
+
+  <p>
+    <strong>In diesem Repository tragen alle 60 Beweisdateien eine
+    Bitcoin-Attestierung</strong> — einen Block, keine Kalender-Zusage.
+    46 davon haben diesen Stand erst am 2026-09-15 erreicht; sie lagen seit
+    Mai unbestätigt auf den Calendar-Servern. Nachgeprüft am 2026-09-20.
+  </p>
+
+  <p>
+    <strong>Die drei Code-Repositories tragen keine.</strong>
+    <code>wakir-runtime</code>, <code>wakir-protocol</code> und
+    <code>wakir-verify</code> haben gar kein
+    <code>meta/timestamps/</code>-Verzeichnis (gemessen am 2026-09-15).
+    Eine frühere Fassung dieser Seite behauptete, jeder Commit in jedem
+    Wakir-Labs-Repository sei zeitgestempelt. Das stimmte nicht. Ob die
+    Stempelung auf diese Repositories ausgeweitet wird, ist offen; bis
+    dahin beschreibt diese Seite, was es gibt.
   </p>
 
   <h2>Drei Schritte</h2>
@@ -46,8 +56,8 @@ const description =
   <h3>1. OpenTimestamps-Client installieren</h3>
 
   <p>
-    Der Referenz-Client ist <code>ots</code>, ausgeliefert als
-    Python-Paket. Auf jeder Plattform mit Python 3.8+:
+    Der Referenz-Client heißt <code>ots</code> und kommt als Python-Paket.
+    Auf jeder Plattform mit Python 3.8 oder neuer:
   </p>
 
   <pre><code>pip install opentimestamps-client</code></pre>
@@ -61,7 +71,7 @@ const description =
   <h3>2. Commit und <code>.ots</code>-Beweis besorgen</h3>
 
   <p>
-    Klone das zu verifizierende Repository. Die Proof-Dateien liegen
+    Klone das Repository, das du prüfen willst. Die Beweisdateien liegen
     unter <code>meta/timestamps/&lt;short-hash&gt;.ots</code>:
   </p>
 
@@ -70,14 +80,14 @@ cd site
 ls meta/timestamps/</code></pre>
 
   <p>
-    Jede Datei ist die <code>.ots</code>-Attestierung für genau einen
-    Commit, benannt nach dem Short-Hash.
+    Jede Datei ist die Attestierung für genau einen Commit, benannt nach
+    dessen Kurz-Hash.
   </p>
 
   <h3>3. <code>ots verify</code> ausführen</h3>
 
   <p>
-    Als ausgearbeitetes Beispiel der Commit <code>82d40f7</code> aus der
+    Als durchgerechnetes Beispiel der Commit <code>82d40f7</code> aus der
     Historie dieser Site (<em>"feat(about): add EN+DE about pages"</em>):
   </p>
 
@@ -87,13 +97,14 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
     Gestempelt wird der 40-stellige Commit-Hash <em>als ASCII-Text mit
-    abschließendem Zeilenumbruch</em> — genau das erzeugt
+    abschließendem Zeilenumbruch</em> — genau das schreibt
     <code>printf "%s\n"</code>. Zwei frühere Fassungen dieser Seite
-    verlangten stattdessen die rohen Hash-Bytes
-    (<code>xxd -r -p</code>); das passt nicht, und <code>ots</code>
-    antwortet mit <code>File does not match original!</code>.
-    Korrigiert am 2026-09-15, nachdem beide veröffentlichten Formen am
-    obigen Beispiel geprüft wurden.
+    verlangten stattdessen die rohen Hash-Bytes (<code>xxd -r -p</code>).
+    Das ist nicht, was gestempelt wurde, und <code>ots</code> weist es ab:
+    <code>File does not match original!</code>. Aufgefallen ist es am
+    2026-09-15 — beim ersten Mal, dass jemand das Beispiel dieser Seite von
+    vorne bis hinten ausgeführt hat. Beide veröffentlichten Formen sind
+    korrigiert.
   </p>
 
   <p>
@@ -104,43 +115,42 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
     Das ist die Quittung. Der Commit existierte spätestens zum Zeitpunkt
-    dieses Bitcoin-Blocks. Vertrauen in uns ist nicht nötig — nur in
-    Bitcoin und in die OpenTimestamps-Calendar-Server (die selbst nur
-    signieren, nicht rückdatieren können).
+    dieses Bitcoin-Blocks. Vertrauen in uns braucht es dafür nicht — nur
+    in Bitcoin und in die OpenTimestamps-Calendar-Server, die signieren,
+    aber nicht rückdatieren können.
   </p>
 
-  <h2>Wo die Quelle der Wahrheit liegt</h2>
+  <h2>Das Firmen-Repository</h2>
 
   <p>
-    Das vollständige Corporate-Repository — ADRs, Activity-Log,
-    Governance — liegt aktuell <strong>lokal beim Aufsichtsrat</strong>
-    und ist noch nicht öffentlich. Öffentliche Verifikation umfasst
-    deshalb heute die <code>wakir-labs/*</code>-Repositories auf GitHub
+    Das vollständige Firmen-Repository — ADRs, Aktivitätsprotokoll,
+    Governance — liegt bislang <strong>nur beim Aufsichtsrat</strong> und
+    ist nicht öffentlich. Öffentlich prüfbar sind deshalb heute die
+    <code>wakir-labs/*</code>-Repositories auf GitHub
     (<a href="https://github.com/wakir-labs">github.com/wakir-labs</a>).
-    Sobald das Corporate-Repository öffentlich wird, gilt dasselbe
-    Rezept: klonen, <code>ots verify</code> auf <code>.ots</code>-Datei
-    und Commit-Hash anwenden, Quittung lesen.
+    Sobald das Firmen-Repository öffentlich wird, gilt dasselbe Rezept:
+    klonen, <code>ots verify</code> auf Beweisdatei und Commit-Hash
+    ansetzen, Quittung lesen.
   </p>
 
   <p>
-    Mitglieder des Aufsichtsrats verifizieren gegen ihren lokalen Klon
-    des Corporate-Repository auf dieselbe Weise.
+    Der Aufsichtsrat prüft seinen lokalen Klon auf genau demselben Weg.
   </p>
 
-  <h2>Fortgeschritten: Verifikation gegen eigenen Bitcoin-Node</h2>
+  <h2>Fortgeschritten: gegen den eigenen Bitcoin-Node prüfen</h2>
 
   <p>
     Standardmäßig sprechen die OpenTimestamps-Tools mit öffentlichen
     Calendar-Servern und, für die Bitcoin-Attestierung, mit einem
-    Remote-Block-Explorer. Mit eigenem Bitcoin-Node lässt sich der
-    Proof Ende-zu-Ende gegen die selbst validierte Chain prüfen:
+    Remote-Block-Explorer. Mit eigenem Bitcoin-Node lässt sich der Beweis
+    Ende-zu-Ende gegen die selbst validierte Chain prüfen:
   </p>
 
-  <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
+  <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
-    Damit fällt die letzte Vertrauensannahme: die Attestierung wird
-    direkt aus einer Chain gelesen, die du selbst validierst.
+    Damit fällt die letzte Vertrauensannahme: Die Attestierung wird direkt
+    aus einer Chain gelesen, die du selbst validierst.
   </p>
 
   <h2>Wenn die Verifikation fehlschlägt</h2>
@@ -151,9 +161,9 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <ul>
     <li>
-      <strong>Der Proof ist "pending".</strong> Frische Commits liegen
-      einige Stunden in den Calendar-Servern, bevor sie in einem
-      Bitcoin-Block aggregiert werden. Nach ein paar Stunden
+      <strong>Der Beweis ist noch "pending".</strong> Frische Commits
+      liegen einige Stunden auf den Calendar-Servern, bevor sie in einen
+      Bitcoin-Block einfließen. Nach ein paar Stunden
       <code>ots upgrade meta/timestamps/&lt;hash&gt;.ots</code> ausführen,
       dann erneut verifizieren.
     </li>
@@ -162,15 +172,16 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
       40-stellige Commit-Hash als ASCII-Text mit abschließendem
       Zeilenumbruch. Erzeuge ihn mit
       <code>printf "%s\n" "$(git rev-parse &lt;commit&gt;)"</code> —
-      nicht mit <code>xxd -r -p</code>.
+      nicht mit <code>xxd -r -p</code>. Frühere Fassungen dieser Seite
+      empfahlen Letzteres; sie lagen falsch.
     </li>
   </ul>
 
   <p>
-    Wenn keiner der beiden Gründe greift,
+    Greift keiner der beiden Gründe,
     <a href="https://github.com/wakir-labs/site/issues">öffne ein Issue</a>.
-    Eine fehlgeschlagene Verifikation auf einem echten Commit ist ein
-    Finding, das wir wissen wollen.
+    Eine fehlgeschlagene Verifikation an einem echten Commit ist ein
+    Befund, den wir wissen wollen.
   </p>
 
   <p>

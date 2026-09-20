@@ -14,21 +14,11 @@ const description =
     Commits in <em>this</em> repository — and in our internal governance
     history — are timestamped against the Bitcoin blockchain via
     <a href="https://opentimestamps.org">OpenTimestamps</a>. The proof is a
-    small <code>.ots</code> file checked in next to the commit hash. With
-    those two things — <em>a commit hash</em> and <em>the matching
-    <code>.ots</code> file</em> — anyone can verify, without trusting us,
-    that the commit existed at or before the timestamp baked into a
-    specific Bitcoin block.
-    </p>
-    <p class="essay__lead">
-    <strong>What is not covered, measured 2026-09-15:</strong> the three code
-    repositories — <code>wakir-runtime</code>, <code>wakir-protocol</code>,
-    <code>wakir-verify</code> — carry <em>no</em> per-commit proofs; they have
-    no <code>meta/timestamps/</code> directory at all. An earlier version of
-    this page claimed every commit in every Wakir Labs repository was
-    timestamped. It was not. Whether to extend commit stamping to those
-    repositories is an open decision; until it is made, this page describes
-    only what actually exists.
+    small <code>.ots</code> file, checked in next to the commit hash. Those
+    two things are all you need: with <em>a commit hash</em> and <em>its
+    matching <code>.ots</code> file</em>, anyone can establish — without
+    trusting us — that the commit existed no later than a specific Bitcoin
+    block.
     </p>
   </header>
 
@@ -37,6 +27,25 @@ const description =
   <p>
     This is the public side of <em>Proof-of-History in practice</em>. It
     is what we mean when we say the documentation is anchored.
+  </p>
+
+  <h2>What this covers</h2>
+
+  <p>
+    <strong>In this repository, all 60 proof files carry a Bitcoin
+    attestation</strong> — a block, not a calendar promise. 46 of them only
+    reached that state on 2026-09-15; they had been sitting unconfirmed in
+    the calendar servers since May. Re-checked 2026-09-20.
+  </p>
+
+  <p>
+    <strong>The three code repositories carry none.</strong>
+    <code>wakir-runtime</code>, <code>wakir-protocol</code> and
+    <code>wakir-verify</code> have no <code>meta/timestamps/</code>
+    directory at all (measured 2026-09-15). An earlier version of this page
+    claimed every commit in every Wakir Labs repository was timestamped. It
+    was not. Whether to extend commit stamping to those repositories is an
+    open decision; until it is made, this page describes what exists.
   </p>
 
   <h2>Three steps</h2>
@@ -84,13 +93,14 @@ printf "%s\n" "$(git rev-parse 82d40f7)" &gt; /tmp/commit.txt
 ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
-    What the hook stamps is the 40-character commit hash <em>as ASCII
-    text, with a trailing newline</em> — that is what
-    <code>printf "%s\n"</code> reproduces. Two earlier versions of this
-    page told you to feed the raw hash bytes (<code>xxd -r -p</code>)
-    instead; that does not match, and <code>ots</code> rejects it with
-    <code>File does not match original!</code>. Corrected 2026-09-15
-    after checking both published forms against the example above.
+    The hook stamps the 40-character commit hash <em>as ASCII text, with a
+    trailing newline</em> — which is exactly what <code>printf "%s\n"</code>
+    writes. Two earlier versions of this page told you to feed the raw hash
+    bytes (<code>xxd -r -p</code>) instead. That is not what was stamped, so
+    <code>ots</code> rejects it with <code>File does not match
+    original!</code>. We found this on 2026-09-15, the first time anyone ran
+    this page's own worked example end to end. Both published forms are
+    corrected.
   </p>
 
   <p>
@@ -101,12 +111,11 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
     That is the receipt. The commit existed at or before that Bitcoin
-    block. No trust in us required — only trust in Bitcoin and in the
-    OpenTimestamps calendar servers (which themselves only sign, they do
-    not back-date).
+    block. No trust in us required — only in Bitcoin and in the
+    OpenTimestamps calendar servers, which sign but cannot back-date.
   </p>
 
-  <h2>Where the source of truth lives</h2>
+  <h2>The corporate repository</h2>
 
   <p>
     The full corporate repository — ADRs, activity log, governance — is
@@ -133,7 +142,7 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
     against your own copy of the chain:
   </p>
 
-  <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.bin meta/timestamps/82d40f7.ots</code></pre>
+  <pre><code>ots --bitcoin-node http://user:pass@127.0.0.1:8332 verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
 
   <p>
     This removes the last residual trust assumption: you are now reading
@@ -154,11 +163,12 @@ ots verify -f /tmp/commit.txt meta/timestamps/82d40f7.ots</code></pre>
       after a few hours, then re-verify.
     </li>
     <li>
-      <strong>You hashed the wrong thing.</strong> Our hook stamps the
+      <strong>You hashed the wrong thing.</strong> The hook stamps the
       40-character commit hash as ASCII text with a trailing newline.
       Reproduce it with
       <code>printf "%s\n" "$(git rev-parse &lt;commit&gt;)"</code> —
-      not with <code>xxd -r -p</code>.
+      not with <code>xxd -r -p</code>. Earlier versions of this page
+      recommended the latter; they were wrong.
     </li>
   </ul>
 
