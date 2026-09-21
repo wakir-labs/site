@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+name: verify-page-selftest
+
+# No `paths:` filter: the page can break without the page file changing
+# (a squash-merge alone moves the resolvable set). It runs on everything.
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    name: verify page self-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the guard resolves historical commits
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install opentimestamps-client==0.7.2
+      - run: bash scripts/verify-page-selftest.sh src/pages/verify.astro
+      - run: bash scripts/verify-page-selftest.sh src/pages/de/verify.astro
