@@ -94,7 +94,7 @@ ls meta/timestamps/</code></pre>
 
   <pre><code>for f in meta/timestamps/*.ots; do
   h=$(basename "$f" .ots)
-  git cat-file -e "$h^{commit}" 2&gt;/dev/null &amp;&amp; echo "$h"
+  git rev-parse --verify --quiet "$h" &gt;/dev/null &amp;&amp; echo "$h"
 done</code></pre>
 
   <h3>3. <code>ots verify</code> ausführen</h3>
